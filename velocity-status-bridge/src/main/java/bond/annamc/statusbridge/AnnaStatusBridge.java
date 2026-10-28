@@ -50,7 +50,7 @@ public final class AnnaStatusBridge {
         JsonObject network = new JsonObject();
         network.addProperty("online", true);
         network.addProperty("playersOnline", proxy.getPlayerCount());
-        network.addProperty("maxPlayers", proxy.getConfiguration().getShowMaxPlayers());
+        network.addProperty("maxPlayers", 0);
         root.add("network", network);
         JsonObject servers = new JsonObject();
         servers.add("lifesteal", serverStatus("lifesteal"));
