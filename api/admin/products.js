@@ -11,6 +11,7 @@ module.exports = async function handler(req, res) {
       return send(res, 200, { products: result.rows });
     }
     const body = parseBody(req);
+    if (req.method === "DELETE" && String(req.query?.id || "") === "all") { if (user.role !== "owner") return send(res,403,{error:"Only the owner can clear the catalogue"}); const result = await pool.query("UPDATE products SET active=false,updated_at=now() WHERE active=true"); await audit(user,"product.archive_all","product",null,{archived:result.rowCount}); return send(res,200,{ok:true,archived:result.rowCount}); }
     if (req.method === "POST") {
       const { id,name,description="",price_paise,target_server,rank_group,active=true,sort_order=100 } = body;
       if (!validId(id) || typeof name !== "string" || !name.trim() || name.length > 100 || typeof description !== "string" || description.length > 2000 || !Number.isSafeInteger(price_paise) || price_paise < 0 || !["lifesteal","practice"].includes(target_server) || typeof rank_group !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(rank_group)) return send(res,400,{error:"Invalid product fields. Price must be integer paise; target_server must be lifesteal, practice or both."});
@@ -30,7 +31,7 @@ module.exports = async function handler(req, res) {
       if (field==="name" && (typeof value!=="string" || !value.trim() || value.length>100)) return send(res,400,{error:"Invalid name"});
       if (field==="description" && (typeof value!=="string" || value.length>2000)) return send(res,400,{error:"Invalid description"});
       if (field==="price_paise" && (!Number.isSafeInteger(value) || value<0)) return send(res,400,{error:"price_paise must be a non-negative integer"});
-      if (field==="target_server" && !["lifesteal","practice","both"].includes(value)) return send(res,400,{error:"Invalid target server"});
+      if (field==="target_server" && !["lifesteal","practice"].includes(value)) return send(res,400,{error:"Invalid target server"});
       if (field==="rank_group" && (typeof value!=="string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(value))) return send(res,400,{error:"Invalid rank group"});
       if (field==="active" && typeof value!=="boolean") return send(res,400,{error:"active must be boolean"});
       if (field==="sort_order" && !Number.isInteger(value)) return send(res,400,{error:"sort_order must be an integer"});
