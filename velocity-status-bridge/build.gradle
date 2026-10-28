@@ -14,7 +14,14 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.11.0'
 }
 
-java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+}
 
 shadowJar { archiveClassifier.set(''); relocate 'com.google.gson', 'bond.annamc.statusbridge.libs.gson' }
 
