@@ -1,4 +1,5 @@
 const { db, send, method, requireAdmin, requireRole, audit, parseBody } = require("../../lib/server");
+const defaults = require("../../lib/default-products");
 const validId = v => typeof v === "string" && /^[a-z0-9][a-z0-9_-]{1,63}$/.test(v);
 module.exports = async function handler(req, res) {
   if (!method(req, res, ["GET","POST","PATCH","DELETE"])) return;
@@ -7,6 +8,7 @@ module.exports = async function handler(req, res) {
   try {
     const pool = db();
     if (req.method === "GET") {
+      for (const p of defaults) await pool.query("INSERT INTO products(id,name,description,price_paise,target_server,rank_group,active,sort_order) VALUES($1,$2,$3,$4,$5,$6,true,$7) ON CONFLICT(id) DO NOTHING", [p.id,p.name,p.description,p.price_paise,p.target_server,p.rank_group,p.sort_order]);
       const result = await pool.query("SELECT id,name,description,price_paise,target_server,rank_group,active,sort_order,created_at,updated_at FROM products ORDER BY sort_order,name");
       return send(res, 200, { products: result.rows });
     }
