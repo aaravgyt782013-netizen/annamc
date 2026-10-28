@@ -8,34 +8,40 @@ module.exports = async function handler(req, res) {
     const email = String(body.email || "").trim().toLowerCase();
     const password = typeof body.password === "string" ? body.password : "";
     if (!validEmail(email) || password.length < 1 || password.length > 200) return send(res, 400, { error: "Enter a valid email and password" });
-    const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim().slice(0, 64);
-    const pool = db();
-    const key = crypto.createHash("sha256").update(email + "|" + ip).digest("hex");
-    const attempts = await pool.query("SELECT count, locked_until FROM login_attempts WHERE attempt_key=$1", [key]);
-    if (attempts.rows[0]?.locked_until && new Date(attempts.rows[0].locked_until).getTime() > Date.now()) return send(res, 429, { error: "Too many attempts. Try again later." });
     const ownerEmail = "aaravg78201333@gmail.com";
     const ownerPassword = String(process.env.ANNA_ADMIN_PASSWORD || "");
     const ownerHash = String(process.env.ANNA_ADMIN_PASSWORD_HASH || "");
     let authorized = false;
-    if (email === ownerEmail && ownerPassword.length > 0) {
-      authorized = safeEqual(password, ownerPassword);
-    } else if (email === ownerEmail && ownerHash.startsWith("$2")) {
-      authorized = await bcrypt.compare(password, ownerHash);
+
+    // Owner authentication does not depend on Neon being available.
+    if (email === ownerEmail) {
+      if (ownerPassword.length > 0) authorized = safeEqual(password, ownerPassword);
+      else if (ownerHash.startsWith("$2")) authorized = await bcrypt.compare(password, ownerHash);
+      else return send(res, 503, { error: "Set ANNA_ADMIN_PASSWORD in Vercel Production environment variables, then redeploy." });
     } else {
+      const pool = db();
+      const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim().slice(0, 64);
+      const key = crypto.createHash("sha256").update(email + "|" + ip).digest("hex");
+      const attempts = await pool.query("SELECT count, locked_until FROM login_attempts WHERE attempt_key=$1", [key]);
+      if (attempts.rows[0]?.locked_until && new Date(attempts.rows[0].locked_until).getTime() > Date.now()) return send(res, 429, { error: "Too many attempts. Try again later." });
       const staff = await pool.query("SELECT password_hash, active FROM staff_users WHERE lower(email)=lower($1)", [email]);
       if (staff.rows[0]?.active && staff.rows[0]?.password_hash) authorized = await bcrypt.compare(password, staff.rows[0].password_hash);
+      if (!authorized) {
+        await pool.query("INSERT INTO login_attempts(attempt_key,count,first_attempt,locked_until) VALUES($1,1,now(),NULL) ON CONFLICT(attempt_key) DO UPDATE SET count=CASE WHEN login_attempts.first_attempt < now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END, first_attempt=CASE WHEN login_attempts.first_attempt < now()-interval '15 minutes' THEN now() ELSE login_attempts.first_attempt END, locked_until=CASE WHEN (CASE WHEN login_attempts.first_attempt < now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END)>=8 THEN now()+interval '15 minutes' ELSE NULL END", [key]);
+      }
     }
-    if (!authorized) {
-      await pool.query("INSERT INTO login_attempts(attempt_key,count,first_attempt,locked_until) VALUES($1,1,now(),NULL) ON CONFLICT(attempt_key) DO UPDATE SET count=CASE WHEN login_attempts.first_attempt < now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END, first_attempt=CASE WHEN login_attempts.first_attempt < now()-interval '15 minutes' THEN now() ELSE login_attempts.first_attempt END, locked_until=CASE WHEN (CASE WHEN login_attempts.first_attempt < now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END)>=8 THEN now()+interval '15 minutes' ELSE NULL END", [key]);
-      return send(res, 401, { error: "Invalid email or password" });
-    }
-    await pool.query("DELETE FROM login_attempts WHERE attempt_key=$1", [key]);
+    if (!authorized) return send(res, 401, { error: "Invalid email or password" });
     const csrf = crypto.randomBytes(32).toString("base64url");
     setSession(res, { email, csrf, exp: Date.now() + 8 * 60 * 60 * 1000 });
-    await pool.query("INSERT INTO audit_logs(actor_email,action,entity_type,details) VALUES($1,'login','session',$2::jsonb)", [email, JSON.stringify({ ip })]);
+    // Audit logging must not prevent a valid owner login.
+    try {
+      await db().query("INSERT INTO audit_logs(actor_email,action,entity_type,details) VALUES($1,'login','session',$2::jsonb)", [email, JSON.stringify({ ip: String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].slice(0, 64) })]);
+    } catch (auditError) {
+      console.error("login audit unavailable:", auditError.message);
+    }
     return send(res, 200, { ok: true, email, csrf, expiresIn: 28800 });
   } catch (e) {
-    console.error("admin login failed", e.message);
-    return send(res, 503, { error: "Login service is not configured. Check database and environment variables." });
+    console.error("admin login failed:", e.message);
+    return send(res, 503, { error: e.message.includes("ANNA_SESSION_SECRET") ? "ANNA_SESSION_SECRET is missing or too short. Set a random secret of at least 32 characters in Vercel and redeploy." : "Login backend failed. Check Vercel Runtime Logs; confirm DATABASE_URL and ANNA_SESSION_SECRET are configured." });
   }
 };
