@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
     const body = parseBody(req);
     if (req.method === "POST") {
       const { id,name,description="",price_paise,target_server,rank_group,active=true,sort_order=100 } = body;
-      if (!validId(id) || typeof name !== "string" || !name.trim() || name.length > 100 || typeof description !== "string" || description.length > 2000 || !Number.isSafeInteger(price_paise) || price_paise < 0 || !["lifesteal","practice","both"].includes(target_server) || typeof rank_group !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(rank_group)) return send(res,400,{error:"Invalid product fields. Price must be integer paise; target_server must be lifesteal, practice or both."});
+      if (!validId(id) || typeof name !== "string" || !name.trim() || name.length > 100 || typeof description !== "string" || description.length > 2000 || !Number.isSafeInteger(price_paise) || price_paise < 0 || !["lifesteal","practice"].includes(target_server) || typeof rank_group !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(rank_group)) return send(res,400,{error:"Invalid product fields. Price must be integer paise; target_server must be lifesteal, practice or both."});
       const result = await pool.query("INSERT INTO products(id,name,description,price_paise,target_server,rank_group,active,sort_order) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",[id,name.trim(),description,price_paise,target_server,rank_group,Boolean(active),Number.isInteger(sort_order)?sort_order:100]);
       await audit(user,"product.create","product",id,{target_server,price_paise}); return send(res,201,{product:result.rows[0]});
     }
