@@ -1,6 +1,6 @@
 const {db,send,method,requireAdmin,requireRole,audit,parseBody}=require("../../lib/server");
 const KEY="voting_config";
-const DEFAULT={enabled:true,heading:"Vote for Anna MC",voteKeyName:"Vote Key",links:[],notes:"Vote on the sites below to support Anna MC."};
+const DEFAULT={enabled:true,heading:"Vote for Anna MC",voteKeyName:"Vote Key for Legend Key",links:[],notes:"Vote on the sites below to support Anna MC."};
 function normalize(v){
  if(!v||typeof v!=="object"||Array.isArray(v))throw new Error("Settings must be a JSON object");
  const enabled=v.enabled!==false;
