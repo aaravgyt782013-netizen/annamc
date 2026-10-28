@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
     const ownerPassword = String(process.env.ANNA_ADMIN_PASSWORD || "");
     const ownerHash = String(process.env.ANNA_ADMIN_PASSWORD_HASH || "");
     let authorized = false;
-    if (email === ownerEmail && ownerPassword.length >= 12) {
+    if (email === ownerEmail && ownerPassword.length > 0) {
       authorized = safeEqual(password, ownerPassword);
     } else if (email === ownerEmail && ownerHash.startsWith("$2")) {
       authorized = await bcrypt.compare(password, ownerHash);
