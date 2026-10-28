@@ -3,6 +3,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/home", "destination": "/index.html" },
+    { "source": "/store", "destination": "/store.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/login", "destination": "/admin.html" }
   ]
