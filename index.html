@@ -328,8 +328,8 @@
                     <a href="wiki.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Wiki</a>
                 </div>
                 <div class="hidden lg:flex items-center gap-3">
-                    <a href="login.html" class="px-4 py-2 text-zinc-400 hover:text-white font-tech font-bold text-xs tracking-widest uppercase transition-colors">Login</a>
-                    <a href="register.html" class="px-4 py-2 bg-white/5 text-white border border-white/10 rounded-xl text-xs font-tech font-bold tracking-widest uppercase hover:bg-white/10 transition-colors">Register</a>
+                    <button type="button" data-open-login class="px-4 py-2 text-zinc-400 hover:text-white font-tech font-bold text-xs tracking-widest uppercase transition-colors">Login</button>
+                    <a href="register.html" class="px-4 py-2 bg-white/5 text-white border border-white/10 rounded-xl text-xs font-tech font-bold tracking-widest uppercase hover:bg-white/10 transition-colors">Register</a><a id="desktop-admin-link" href="/admin" class="hidden px-4 py-2 bg-primary text-on-primary rounded-xl text-xs font-tech font-bold tracking-widest uppercase">Admin Panel</a>
                 </div>
                 <button id="mobile-menu-toggle" class="xl:hidden p-2 rounded-2xl border border-white/10 text-white/80 hover:text-white" aria-label="Toggle navigation">
                     <span class="material-symbols-outlined">menu</span>
@@ -344,7 +344,7 @@
                     <a href="forums.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Forums</a>
                     <a href="wiki.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Wiki</a>
                     <div class="pt-3 border-t border-white/10 mt-3 flex flex-col gap-2">
-                        <a href="login.html" class="px-4 py-3 bg-white/5 text-white rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-white/10">Login</a>
+                        <button type="button" data-open-login class="px-4 py-3 bg-white/5 text-white rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-white/10">Login</button><a id="mobile-admin-link" href="/admin" class="hidden px-4 py-3 bg-primary text-on-primary rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center">Admin Panel</a>
                         <a href="register.html" class="px-4 py-3 bg-primary text-on-primary rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-primary-fixed">Register</a>
                     </div>
                 </div>
@@ -1070,6 +1070,37 @@
  }catch(e){if(count)count.textContent="Status unavailable";for(const nodes of Object.values(labels)){if(nodes[0])nodes[0].textContent="Status unavailable";if(nodes[1])nodes[1].textContent="Live feed not connected";}}
 })();
 </script>
+
+    <div id="home-login-modal" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md p-4 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="home-login-title">
+      <div class="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 border-primary/30 shadow-2xl">
+        <div class="flex items-start justify-between gap-4 mb-5"><div><p class="text-primary text-xs font-tech tracking-[.25em] uppercase mb-2">Anna MC Account</p><h2 id="home-login-title" class="text-2xl font-bold text-white">Sign in</h2><p class="text-zinc-400 text-sm mt-2">Sign in to your account. Owner access reveals the Admin Panel.</p></div><button type="button" id="home-login-close" class="text-zinc-300 hover:text-white text-2xl" aria-label="Close login">×</button></div>
+        <form id="home-login-form" class="grid gap-4">
+          <label class="grid gap-2 text-sm text-zinc-300">Email<input id="home-login-email" type="email" autocomplete="username" required maxlength="254" class="w-full rounded-xl bg-black/40 border border-white/15 p-3 text-white"></label>
+          <label class="grid gap-2 text-sm text-zinc-300">Password<input id="home-login-password" type="password" autocomplete="current-password" required maxlength="200" class="w-full rounded-xl bg-black/40 border border-white/15 p-3 text-white"></label>
+          <p id="home-login-message" class="hidden rounded-xl p-3 text-sm" role="status"></p>
+          <button id="home-login-submit" type="submit" class="rounded-xl bg-primary text-on-primary font-bold py-3 hover:brightness-110">Sign in securely</button>
+        </form>
+        <p class="text-xs text-zinc-500 mt-4">Your password is verified by the server and is never stored in this page.</p>
+      </div>
+    </div>
+    <script>
+    (function(){
+      const modal=document.getElementById('home-login-modal'), form=document.getElementById('home-login-form');
+      const msg=document.getElementById('home-login-message'), submit=document.getElementById('home-login-submit');
+      const show=(text,bad)=>{msg.textContent=text;msg.classList.remove('hidden');msg.style.background=bad?'rgba(127,29,29,.5)':'rgba(22,101,52,.35)';msg.style.color=bad?'#fecaca':'#bbf7d0';};
+      const open=()=>{modal.classList.remove('hidden');document.getElementById('home-login-email').focus();};
+      const close=()=>modal.classList.add('hidden');
+      document.querySelectorAll('[data-open-login]').forEach(b=>b.addEventListener('click',open));
+      document.getElementById('home-login-close').addEventListener('click',close);
+      modal.addEventListener('click',e=>{if(e.target===modal)close();});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+      const revealAdmin=()=>{document.getElementById('desktop-admin-link')?.classList.remove('hidden');document.getElementById('mobile-admin-link')?.classList.remove('hidden');document.querySelectorAll('[data-open-login]').forEach(b=>b.textContent='Account');};
+      async function checkSession(){try{const r=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(r.ok){const u=await r.json();if(u.authenticated&&u.role==='owner')revealAdmin();}}catch(_){}}
+      form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');submit.disabled=true;submit.textContent='Signing in…';try{const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('home-login-email').value.trim(),password:document.getElementById('home-login-password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Login failed. Please try again.');document.getElementById('home-login-password').value='';show('Signed in successfully.',false);if(String(d.email||'').toLowerCase()==='aaravg78201333@gmail.com'){revealAdmin();setTimeout(()=>{close();location.href='/admin';},450);}else{setTimeout(close,900);}}catch(err){show(err.message||'Unable to sign in. Check the server deployment.',true);}finally{submit.disabled=false;submit.textContent='Sign in securely';}});
+      checkSession();
+    })();
+    </script>
+
 </body>
 
 </html>
