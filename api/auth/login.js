@@ -10,14 +10,12 @@ module.exports = async function handler(req, res) {
     if (!validEmail(email) || password.length < 1 || password.length > 200) return send(res, 400, { error: "Enter a valid email and password" });
     const ownerEmail = "aaravg78201333@gmail.com";
     const ownerPassword = String(process.env.ANNA_ADMIN_PASSWORD || "");
-    const ownerHash = String(process.env.ANNA_ADMIN_PASSWORD_HASH || "");
     let authorized = false;
 
     // Owner authentication does not depend on Neon being available.
     if (email === ownerEmail) {
-      if (ownerPassword.length > 0) authorized = safeEqual(password, ownerPassword);
-      else if (ownerHash.startsWith("$2")) authorized = await bcrypt.compare(password, ownerHash);
-      else return send(res, 503, { error: "Set ANNA_ADMIN_PASSWORD in Vercel Production environment variables, then redeploy." });
+      if (!ownerPassword) return send(res, 503, { error: "Set ANNA_ADMIN_PASSWORD in the deployment environment, then redeploy." });
+      authorized = safeEqual(password, ownerPassword);
     } else {
       const pool = db();
       const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim().slice(0, 64);
