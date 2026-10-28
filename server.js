@@ -64,9 +64,11 @@ async function handle(req, res) {
   if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, "index.html");
   if (!fs.existsSync(file) || !fs.statSync(file).isFile()) return send(res, 404, "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Not found • Anna MC</title></head><body style=\"background:#131314;color:#e5e2e3;font:16px system-ui;padding:3rem\"><h1>Page not found</h1><p>The page you requested does not exist.</p><a style=\"color:#f2ca50\" href=\"/home\">Return to Anna MC</a></body></html>", "text/html; charset=utf-8");
   const ext = path.extname(file).toLowerCase();
-  if (!MIME[ext] || [".js",".json"].includes(ext) && !file.startsWith(path.join(ROOT, "assets") + path.sep)) {
-    if (![".html",".css",".svg",".png",".jpg",".jpeg",".webp",".ico",".webmanifest",".woff2",".txt"].includes(ext)) return send(res, 404, "Not found");
-  }
+  const relative = path.relative(ROOT, file).split(path.sep);
+  const protectedFile = relative.some(part => part.startsWith(".")) ||
+    ["api","lib","database","node_modules"].includes(relative[0]) ||
+    ["server.js","package.json","package-lock.json"].includes(relative[0]);
+  if (protectedFile || !MIME[ext] || ext === ".json") return send(res, 404, "Not found");
   if (req.method !== "GET" && req.method !== "HEAD") return send(res, 405, "Method not allowed");
   res.statusCode = 200;
   res.setHeader("Content-Type", MIME[ext] || "application/octet-stream");
