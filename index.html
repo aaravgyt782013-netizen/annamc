@@ -436,7 +436,7 @@
                     <p class="text-[10px] text-zinc-500 font-bold tracking-[0.3em] uppercase">IP: play.annamc.bond</p>
                     <div class="flex items-center justify-center md:justify-start gap-2 mt-1 md:mt-0">
                         <div class="w-2 h-2 bg-secondary rounded-full animate-ping"></div>
-                        <p class="text-secondary text-sm font-minecraft">1,248 ONLINE</p>
+                        <p id="network-player-count" class="text-secondary text-sm font-minecraft">Checking live status…</p>
                     </div>
                 </div>
             </div>
@@ -1051,6 +1051,20 @@
             }, 3000);
         }
     </script>
+<script>
+(async function annaLiveStatus(){
+ const count=document.getElementById("network-player-count");
+ const labels={lifesteal:[document.getElementById("lifesteal-status"),document.getElementById("lifesteal-players")],practice:[document.getElementById("practice-status"),document.getElementById("practice-players")]};
+ const safeNum=n=>Number.isFinite(Number(n))&&Number(n)>=0?Math.floor(Number(n)):0;
+ try{
+  const res=await fetch("/api/status",{cache:"no-store"});
+  const data=await res.json();
+  if(!data.configured||data.stale){if(count)count.textContent="Status unavailable";for(const [name,nodes] of Object.entries(labels)){if(nodes[0])nodes[0].textContent="Status unavailable";if(nodes[1])nodes[1].textContent="Live feed not connected";}return;}
+  if(count)count.textContent=safeNum(data.network.playersOnline).toLocaleString()+" ONLINE";
+  for(const [name,nodes] of Object.entries(labels)){const s=data.servers?.[name]||{};if(nodes[0])nodes[0].textContent=s.online?"ONLINE":"OFFLINE";if(nodes[1])nodes[1].textContent=s.online?(safeNum(s.playersOnline).toLocaleString()+" players"):"Server unreachable";}
+ }catch(e){if(count)count.textContent="Status unavailable";for(const nodes of Object.values(labels)){if(nodes[0])nodes[0].textContent="Status unavailable";if(nodes[1])nodes[1].textContent="Live feed not connected";}}
+})();
+</script>
 </body>
 
 </html>
