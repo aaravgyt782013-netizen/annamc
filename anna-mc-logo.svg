@@ -1,1 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title"><title id="title">Anna MC logo</title><defs><radialGradient id="sky" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#168cff"/><stop offset="1" stop-color="#06152e"/></radialGradient><linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7ffaff"/><stop offset=".48" stop-color="#00d5ff"/><stop offset="1" stop-color="#0758ff"/></linearGradient><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="300" cy="300" r="272" fill="url(#sky)" stroke="#00dfff" stroke-width="12" filter="url(#glow)"/><path d="M110 300 170 170 245 130 300 80 355 130 430 170 490 300 440 410 360 465 300 510 240 465 160 410Z" fill="#0a2545" stroke="#39dfff" stroke-width="5"/><g fill="#39bfff" opacity=".8"><path d="M130 300 190 230 240 260 280 200 320 240 365 190 425 245 470 300 420 355 380 335 330 390 280 355 225 390 180 340Z"/><path d="M130 300 190 230 240 260 280 200 320 240 365 190 425 245 470 300 420 355 380 335 330 390 280 355 225 390 180 340Z" fill="#0a75bd"/></g><path d="M265 135 300 95 335 135 326 175 274 175Z" fill="url(#cyan)" stroke="#e9ffff" stroke-width="5"/><text x="300" y="295" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-size="112" font-weight="900" fill="#f7fbff" stroke="#06152b" stroke-width="14" paint-order="stroke">ANNA</text><text x="300" y="405" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-size="112" font-weight="900" fill="url(#cyan)" stroke="#06152b" stroke-width="14" paint-order="stroke">MC</text><path d="M130 430 205 415 180 445 125 455M470 430 395 415 420 445 475 455" fill="none" stroke="#00dfff" stroke-width="9" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+<title id="title">Anna MC</title><desc id="desc">A crowned cyan and white Anna MC emblem over a floating voxel island, on a transparent background.</desc>
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0759df"/><stop offset=".58" stop-color="#20baff"/><stop offset="1" stop-color="#062d78"/></linearGradient>
+ <linearGradient id="ice" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#d9f1ff"/><stop offset="1" stop-color="#8dcfff"/></linearGradient>
+ <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#71ffff"/><stop offset=".48" stop-color="#00d9ff"/><stop offset="1" stop-color="#0753ff"/></linearGradient>
+ <linearGradient id="dirt" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#76e85c"/><stop offset=".34" stop-color="#318a39"/><stop offset=".35" stop-color="#85512f"/><stop offset="1" stop-color="#172b49"/></linearGradient>
+ <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="7"/><feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope=".8"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <clipPath id="disc"><circle cx="400" cy="365" r="300"/></clipPath>
+</defs>
+<circle cx="400" cy="365" r="306" fill="none" stroke="#00dfff" stroke-width="10" filter="url(#glow)"/>
+<circle cx="400" cy="365" r="294" fill="url(#sky)" stroke="#8cfaff" stroke-width="3"/>
+<g clip-path="url(#disc)">
+ <g fill="#e9f8ff" opacity=".95"><path d="M115 210l40-26 43 25-42 23z"/><path d="M510 155l34-22 38 22-37 21z"/><path d="M585 245l28-18 33 19-31 18z"/><path d="M240 145l25-16 31 18-29 17z"/></g>
+ <path d="M80 430 150 340 215 330 265 255 320 286 380 205 430 255 485 220 540 295 610 322 710 430Z" fill="#8cb9d9"/>
+ <path d="M265 255l55 31 60-81 50 50 35-35 55 75-65-18-38 20-43-30-48 25-40-17-35 18-35-25z" fill="#f3fbff"/>
+ <path d="M80 430 150 340 215 330 265 255 320 286 380 205 430 255 485 220 540 295 610 322 710 430Z" fill="#516f8c" opacity=".55"/>
+ <g fill="#278b3b" stroke="#15552d" stroke-width="4">
+  <path d="M125 425l35-65 42 5 32 60z"/><path d="M195 385l25-62 48 5 28 65z"/><path d="M510 390l28-74 50 10 35 64z"/><path d="M575 435l28-62 45 8 28 54z"/>
+  <path d="M285 355l32-75 50 10 30 65z"/><path d="M420 350l30-65 46 8 32 57z"/>
+ </g>
+ <g fill="#47c84c"><rect x="133" y="383" width="42" height="26"/><rect x="210" y="347" width="48" height="28"/><rect x="295" y="316" width="48" height="27"/><rect x="436" y="315" width="43" height="28"/><rect x="530" y="339" width="47" height="28"/><rect x="595" y="397" width="43" height="25"/></g>
+ <path d="M90 445l75-20 75 15 65-27 75 22 65-23 70 22 75-22 120 30-28 65-60 35-53 35-63 32-63 30-55 20-45-35-56-27-57-36-53-35-44-41z" fill="url(#dirt)" stroke="#142b4b" stroke-width="8"/>
+ <g fill="#4c83a8" stroke="#17314f" stroke-width="5"><path d="M180 525l64 18-7 44-53-17z"/><path d="M244 543l64 16-4 46-61-18z"/><path d="M308 559l65 16-2 48-62-19z"/><path d="M373 575l64 10-4 47-59-8z"/><path d="M437 573l65-16 10 45-71 27z"/><path d="M502 557l61-22 17 42-67 23z"/><path d="M563 535l61-24 20 39-64 27z"/></g>
+ <path d="M410 320l25 0 0 265-25 43-22-43V345z" fill="#00cfff" opacity=".85"/><path d="M416 320h8v300h-8z" fill="#bafaff" opacity=".8"/>
+</g>
+<g filter="url(#shadow)">
+ <path d="M318 205l-10-57 48 27 44-66 44 66 48-27-10 57z" fill="url(#cyan)" stroke="#06152e" stroke-width="15" stroke-linejoin="round"/>
+ <path d="M318 205l-10-57 48 27 44-66 44 66 48-27-10 57z" fill="none" stroke="#a9ffff" stroke-width="4"/>
+ <path d="M375 169l25-22 25 22-25 22z" fill="#e7ffff" stroke="#006dff" stroke-width="5"/>
+ <text x="400" y="390" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="156" font-weight="900" letter-spacing="-7" fill="url(#ice)" stroke="#06152b" stroke-width="26" paint-order="stroke" filter="url(#shadow)">ANNA</text>
+ <text x="400" y="535" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="160" font-weight="900" letter-spacing="2" fill="url(#cyan)" stroke="#06152b" stroke-width="27" paint-order="stroke" filter="url(#shadow)">MC</text>
+ <path d="M95 475l135-22-50 38-72 12M705 475l-135-22 50 38 72 12" fill="none" stroke="#00eaff" stroke-width="12" stroke-linejoin="round"/>
+</g>
+</svg>
