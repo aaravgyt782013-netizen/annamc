@@ -1170,23 +1170,46 @@
 
     <script>
         const storeCatalog = {
-            'VIP Rank': 10.49,
-            'MVP Rank': 24.49,
-            'Titan Rank': 52.49,
-            'Legend Rank': 104.99,
-            '5x Rare Keys': 4.99,
-            '5x Epic Keys': 9.99,
-            '5x Legend Keys': 19.99,
-            '10x Ultimate Keys': 34.99,
-            '500 Coins': 2.49,
-            '1200 Coins': 9.99,
-            '3500 Coins': 24.99,
-            '7500 Coins': 44.99,
-            'Starter Bundle': 12.99,
-            'Builder Bundle': 19.99,
-            'Season Pass': 29.99,
-            'Ultimate Bundle': 49.99
+            'VIP Rank': 99, 'MVP Rank': 199, 'Titan Rank': 399, 'Legend Rank': 699,
+            '5x Rare Keys': 49.99, '5x Epic Keys': 99.99, '5x Legend Keys': 149.99,
+            '10x Ultimate Keys': 249.99, '500 Coins': 49.99, '1200 Coins': 99.99,
+            '3500 Coins': 199.99, '7500 Coins': 349.99, 'Starter Bundle': 99.99,
+            'Builder Bundle': 149.99, 'Season Pass': 199.99, 'Ultimate Bundle': 299.99
         };
+        const managedProducts = {};
+        const formatINR = amount => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(Number(amount) || 0);
+        async function loadManagedStoreCatalog() {
+            try {
+                const response = await fetch('/api/products', { cache: 'no-store' });
+                if (!response.ok) throw new Error('Catalogue API unavailable');
+                const data = await response.json();
+                if (!Array.isArray(data.products)) throw new Error('Invalid catalogue');
+                const activeById = new Map(data.products.map(p => [String(p.id), p]));
+                document.querySelectorAll('.store-card').forEach(card => {
+                    const button = card.querySelector('button[onclick*="addToCart("]');
+                    if (!button) return;
+                    const match = button.getAttribute('onclick')?.match(/addToCart\('([^']+)'\)/);
+                    if (!match) return;
+                    const originalName = match[1];
+                    const id = originalName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                    const product = activeById.get(id);
+                    if (!product) { card.hidden = true; return; }
+                    card.hidden = false;
+                    managedProducts[product.name] = product;
+                    managedProducts[originalName] = product;
+                    storeCatalog[originalName] = Number(product.price_paise) / 100;
+                    storeCatalog[product.name] = Number(product.price_paise) / 100;
+                    button.setAttribute('onclick', 'addToCart(' + JSON.stringify(product.name) + ')');
+                    const heading = card.querySelector('h3');
+                    if (heading) heading.textContent = product.name;
+                    const priceNode = card.querySelector('.text-xl.font-bold.text-primary');
+                    if (priceNode) priceNode.textContent = formatINR(Number(product.price_paise) / 100);
+                    const oldPrice = card.querySelector('p.line-through');
+                    if (oldPrice) oldPrice.hidden = true;
+                });
+            } catch (error) { console.warn('Using fallback INR store catalogue:', error && error.message || 'unavailable'); }
+        }
+        loadManagedStoreCatalog();
 
         const cart = [];
 
@@ -1200,7 +1223,7 @@
             cart.push({
                 name: itemName,
                 price: storeCatalog[itemName],
-                server: selectedServer
+                server: managedProducts[itemName]?.target_server || selectedServer
             });
             renderCart();
             showNotification(itemName + ' added to cart');
@@ -1224,10 +1247,10 @@
             const total = cart.reduce((sum, item) => sum + item.price, 0);
 
             cartCount.innerText = cart.length;
-            cartTotal.innerText = `$${total.toFixed(2)}`;
+            cartTotal.innerText = formatINR(total);
             cartItemCount.innerText = `${cart.length} item${cart.length === 1 ? '' : 's'}`;
-            cartTotalAmount.innerText = `$${total.toFixed(2)}`;
-            cartGrandTotal.innerText = `$${total.toFixed(2)}`;
+            cartTotalAmount.innerText = formatINR(total);
+            cartGrandTotal.innerText = formatINR(total);
             checkoutButton.disabled = cart.length === 0;
 
             if (cart.length === 0) {
@@ -1237,7 +1260,7 @@
                     <li class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-white/5 border border-white/10">
                         <div>
                             <p class="text-sm font-bold text-white font-tech">${item.name}</p>
-                            <p class="text-xs text-zinc-400 font-tech">$${item.price.toFixed(2)}</p>
+                            <p class="text-xs text-zinc-400 font-tech">${formatINR(item.price)}</p>
                         </div>
                         <button onclick="removeFromCart(${index})"
                             class="text-xs uppercase tracking-widest text-primary font-bold font-tech hover:text-white">Remove</button>
@@ -1259,7 +1282,7 @@
             const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
             const invoiceId = 'ANNA-' + new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14) + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
             const createdAt = new Date();
-            const money = amount => '$' + Number(amount).toFixed(2);
+            const money = amount => formatINR(amount);
             const safe = value => String(value).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
             const rows = cart.map(item => '<tr><td>' + safe(item.name) + '</td><td>' + safe(item.server === 'practice' ? 'Practice' : 'LifeSteal') + '</td><td>' + money(item.price) + '</td></tr>').join('');
             let modal = document.getElementById('anna-invoice-modal');
@@ -1271,7 +1294,7 @@
             }
             modal.innerHTML = '<section style="background:#10131b;color:#f5f7ff;border:1px solid #334155;border-radius:18px;padding:24px;max-width:760px;width:100%;font-family:Arial,sans-serif;box-shadow:0 20px 80px #000">' +
                 '<div style="display:flex;justify-content:space-between;gap:12px;align-items:start"><div><p style="color:#60a5fa;letter-spacing:3px;font-size:12px;font-weight:bold">ANNA MC • STORE</p><h2 style="font-size:28px;margin:8px 0">Purchase Invoice</h2><p style="color:#aab5c7;margin:0">Invoice ' + safe(invoiceId) + '</p></div><button onclick="document.getElementById(\'anna-invoice-modal\').remove()" style="background:#263244;color:white;border:0;border-radius:8px;padding:10px 14px;cursor:pointer">Close</button></div>' +
-                '<hr style="border-color:#334155;margin:20px 0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><p><span style="color:#94a3b8">Minecraft username</span><br><strong>' + safe(username) + '</strong></p><p><span style="color:#94a3b8">Invoice date</span><br><strong>' + safe(createdAt.toLocaleString()) + '</strong></p><p><span style="color:#94a3b8">Status</span><br><strong style="color:#fbbf24">Awaiting ticket/payment verification</strong></p><p><span style="color:#94a3b8">Currency</span><br><strong>USD (as shown in store)</strong></p></div>' +
+                '<hr style="border-color:#334155;margin:20px 0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><p><span style="color:#94a3b8">Minecraft username</span><br><strong>' + safe(username) + '</strong></p><p><span style="color:#94a3b8">Invoice date</span><br><strong>' + safe(createdAt.toLocaleString()) + '</strong></p><p><span style="color:#94a3b8">Status</span><br><strong style="color:#fbbf24">Awaiting ticket/payment verification</strong></p><p><span style="color:#94a3b8">Currency</span><br><strong>INR (Indian Rupees)</strong></p></div>' +
                 '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;margin:12px 0 18px"><thead><tr style="text-align:left;color:#93c5fd"><th style="padding:10px;border-bottom:1px solid #334155">Item</th><th style="padding:10px;border-bottom:1px solid #334155">Server</th><th style="padding:10px;border-bottom:1px solid #334155">Price</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
                 '<div style="text-align:right;font-size:22px;font-weight:bold;margin:16px 0">Total: ' + money(total) + '</div>' +
                 '<div style="background:#172033;border:1px solid #334155;border-radius:12px;padding:16px"><h3 style="margin:0 0 8px;color:#93c5fd">How to claim your reward</h3><ol style="line-height:1.8;padding-left:22px;margin:0"><li>Join the official Anna MC Discord server.</li><li>Open a support/ticket channel.</li><li>Send this invoice (invoice ID, username, items and total) to staff.</li><li>Follow staff payment instructions and wait for verification.</li><li>After verification, staff will arrange your reward; allow up to 3 days.</li></ol><p style="color:#fbbf24;margin-bottom:0">This invoice is a purchase request, not proof of payment. Do not send payment to unofficial accounts.</p></div>' +
