@@ -38,7 +38,8 @@ function parseJsonBody(req) {
 async function handle(req, res) {
   let url;
   try { url = new URL(req.url, "http://localhost"); } catch { return send(res, 400, "Bad request"); }
-  let pathname = decodeURIComponent(url.pathname);\n  req.query = Object.fromEntries(url.searchParams.entries());
+  let pathname = decodeURIComponent(url.pathname);
+  req.query = Object.fromEntries(url.searchParams.entries());
   if (pathname.startsWith("/api/")) {
     if (!/^\/api\/[a-zA-Z0-9_/-]+$/.test(pathname) || pathname.includes("..")) return send(res, 404, JSON.stringify({error:"Not found"}), "application/json; charset=utf-8");
     const modulePath = path.join(ROOT, pathname.slice(1) + ".js");
