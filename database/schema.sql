@@ -76,3 +76,9 @@ CREATE TABLE IF NOT EXISTS site_settings (
   updated_by text NOT NULL,
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS network_status (
+  status_key text PRIMARY KEY,
+  status_value jsonb NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
