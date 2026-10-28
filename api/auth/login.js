@@ -13,10 +13,13 @@ module.exports = async function handler(req, res) {
     const key = crypto.createHash("sha256").update(email + "|" + ip).digest("hex");
     const attempts = await pool.query("SELECT count, locked_until FROM login_attempts WHERE attempt_key=$1", [key]);
     if (attempts.rows[0]?.locked_until && new Date(attempts.rows[0].locked_until).getTime() > Date.now()) return send(res, 429, { error: "Too many attempts. Try again later." });
-    const ownerEmail = String(process.env.ANNA_ADMIN_EMAIL || "").trim().toLowerCase();
+    const ownerEmail = "aaravg78201333@gmail.com";
+    const ownerPassword = String(process.env.ANNA_ADMIN_PASSWORD || "");
     const ownerHash = String(process.env.ANNA_ADMIN_PASSWORD_HASH || "");
     let authorized = false;
-    if (email && email === ownerEmail && ownerHash.startsWith("$2")) {
+    if (email === ownerEmail && ownerPassword.length >= 12) {
+      authorized = safeEqual(password, ownerPassword);
+    } else if (email === ownerEmail && ownerHash.startsWith("$2")) {
       authorized = await bcrypt.compare(password, ownerHash);
     } else {
       const staff = await pool.query("SELECT password_hash, active FROM staff_users WHERE lower(email)=lower($1)", [email]);
