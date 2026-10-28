@@ -1184,8 +1184,12 @@
                 if (!response.ok) throw new Error('Catalogue API unavailable');
                 const data = await response.json();
                 if (!Array.isArray(data.products)) throw new Error('Invalid catalogue');
-                const activeById = new Map(data.products.map(p => [String(p.id), p]));
+                const activeProducts = data.products;
+                const activeById = new Map(activeProducts.map(p => [String(p.id), p]));
+                const renderedIds = new Set();
+
                 document.querySelectorAll('.store-card').forEach(card => {
+                    if (card.dataset.adminGenerated === 'true') return;
                     const button = card.querySelector('button[onclick*="addToCart("]');
                     if (!button) return;
                     const match = button.getAttribute('onclick')?.match(/addToCart\('([^']+)'\)/);
@@ -1195,6 +1199,7 @@
                     const product = activeById.get(id);
                     if (!product) { card.hidden = true; return; }
                     card.hidden = false;
+                    renderedIds.add(String(product.id));
                     managedProducts[product.name] = product;
                     managedProducts[originalName] = product;
                     storeCatalog[originalName] = Number(product.price_paise) / 100;
@@ -1206,8 +1211,47 @@
                     if (priceNode) priceNode.textContent = formatINR(Number(product.price_paise) / 100);
                     const oldPrice = card.querySelector('p.line-through');
                     if (oldPrice) oldPrice.hidden = true;
+                    const description = card.querySelector('[data-product-description]');
+                    if (description) description.textContent = product.description || '';
                 });
-            } catch (error) { console.warn('Using fallback INR store catalogue:', error && error.message || 'unavailable'); }
+
+                // Products created in the admin panel also appear on the public store.
+                const grid = document.querySelector('.store-card')?.parentElement;
+                if (grid) {
+                    grid.querySelectorAll('[data-admin-generated="true"]').forEach(node => node.remove());
+                    activeProducts.filter(p => !renderedIds.has(String(p.id))).forEach(product => {
+                        managedProducts[product.name] = product;
+                        storeCatalog[product.name] = Number(product.price_paise) / 100;
+                        const card = document.createElement('article');
+                        card.className = 'store-card glass-panel rounded-3xl p-6 border border-white/10 flex flex-col h-full relative overflow-hidden';
+                        card.dataset.adminGenerated = 'true';
+                        const serverLabel = product.target_server === 'practice' ? 'Practice' : product.target_server === 'both' ? 'Network' : 'LifeSteal';
+                        const heading = document.createElement('h3');
+                        heading.className = 'text-xl font-black text-white font-minecraft uppercase tracking-tight mb-2';
+                        heading.textContent = product.name;
+                        const desc = document.createElement('p');
+                        desc.className = 'text-sm text-zinc-400 font-tech flex-grow mb-5';
+                        desc.textContent = product.description || serverLabel + ' store item';
+                        const tag = document.createElement('p');
+                        tag.className = 'text-xs text-zinc-500 uppercase tracking-widest mb-3';
+                        tag.textContent = serverLabel;
+                        const price = document.createElement('p');
+                        price.className = 'text-xl font-bold text-primary mb-5';
+                        price.textContent = formatINR(Number(product.price_paise) / 100);
+                        const add = document.createElement('button');
+                        add.type = 'button';
+                        add.className = 'w-full py-3 bg-primary text-black font-black uppercase tracking-widest text-sm rounded-xl';
+                        add.textContent = 'Add to cart';
+                        add.addEventListener('click', () => addToCart(product.name));
+                        card.append(tag, heading, desc, price, add);
+                        grid.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                console.warn('Using fallback INR store catalogue:', error && error.message || 'unavailable');
+                const note = document.getElementById('store-catalogue-notice');
+                if (note) note.textContent = 'Live catalogue unavailable. Prices may be outdated; please retry before placing an order.';
+            }
         }
         loadManagedStoreCatalog();
 
