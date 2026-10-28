@@ -1247,13 +1247,36 @@
         }
 
         function checkoutCart() {
-            if (cart.length === 0) { showNotification('No items in cart'); return; }
+            if (!cart.length) { showNotification('Your cart is empty'); return; }
             const input = document.getElementById('anna-minecraft-username');
             const username = (input?.value || '').trim();
-            if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) { input?.focus(); showNotification('Enter a valid Minecraft username first'); return; }
-            const total = cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
-            const items = cart.map(item => item.name + ' — ' + (item.server === 'practice' ? 'Practice' : 'LifeSteal')).join('\n');
-            window.alert('Anna MC order preview\n\nPlayer: ' + username + '\n' + items + '\n\nCurrent total: 
+            if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) {
+                input?.focus();
+                showNotification('Enter a valid Minecraft username first');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
+            const invoiceId = 'ANNA-' + new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14) + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+            const createdAt = new Date();
+            const money = amount => '$' + Number(amount).toFixed(2);
+            const safe = value => String(value).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+            const rows = cart.map(item => '<tr><td>' + safe(item.name) + '</td><td>' + safe(item.server === 'practice' ? 'Practice' : 'LifeSteal') + '</td><td>' + money(item.price) + '</td></tr>').join('');
+            let modal = document.getElementById('anna-invoice-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'anna-invoice-modal';
+                modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.82);overflow:auto;padding:20px;display:flex;align-items:center;justify-content:center';
+                document.body.appendChild(modal);
+            }
+            modal.innerHTML = '<section style="background:#10131b;color:#f5f7ff;border:1px solid #334155;border-radius:18px;padding:24px;max-width:760px;width:100%;font-family:Arial,sans-serif;box-shadow:0 20px 80px #000">' +
+                '<div style="display:flex;justify-content:space-between;gap:12px;align-items:start"><div><p style="color:#60a5fa;letter-spacing:3px;font-size:12px;font-weight:bold">ANNA MC • STORE</p><h2 style="font-size:28px;margin:8px 0">Purchase Invoice</h2><p style="color:#aab5c7;margin:0">Invoice ' + safe(invoiceId) + '</p></div><button onclick="document.getElementById(\'anna-invoice-modal\').remove()" style="background:#263244;color:white;border:0;border-radius:8px;padding:10px 14px;cursor:pointer">Close</button></div>' +
+                '<hr style="border-color:#334155;margin:20px 0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><p><span style="color:#94a3b8">Minecraft username</span><br><strong>' + safe(username) + '</strong></p><p><span style="color:#94a3b8">Invoice date</span><br><strong>' + safe(createdAt.toLocaleString()) + '</strong></p><p><span style="color:#94a3b8">Status</span><br><strong style="color:#fbbf24">Awaiting ticket/payment verification</strong></p><p><span style="color:#94a3b8">Currency</span><br><strong>USD (as shown in store)</strong></p></div>' +
+                '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;margin:12px 0 18px"><thead><tr style="text-align:left;color:#93c5fd"><th style="padding:10px;border-bottom:1px solid #334155">Item</th><th style="padding:10px;border-bottom:1px solid #334155">Server</th><th style="padding:10px;border-bottom:1px solid #334155">Price</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+                '<div style="text-align:right;font-size:22px;font-weight:bold;margin:16px 0">Total: ' + money(total) + '</div>' +
+                '<div style="background:#172033;border:1px solid #334155;border-radius:12px;padding:16px"><h3 style="margin:0 0 8px;color:#93c5fd">How to claim your reward</h3><ol style="line-height:1.8;padding-left:22px;margin:0"><li>Join the official Anna MC Discord server.</li><li>Open a support/ticket channel.</li><li>Send this invoice (invoice ID, username, items and total) to staff.</li><li>Follow staff payment instructions and wait for verification.</li><li>After verification, staff will arrange your reward; allow up to 3 days.</li></ol><p style="color:#fbbf24;margin-bottom:0">This invoice is a purchase request, not proof of payment. Do not send payment to unofficial accounts.</p></div>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px"><button onclick="window.print()" style="background:#60a5fa;color:#07111f;border:0;border-radius:9px;padding:12px 16px;font-weight:bold;cursor:pointer">Print / Save PDF</button><button onclick="navigator.clipboard.writeText(' + JSON.stringify('Anna MC Invoice ' + invoiceId + '\nDate: ' + createdAt.toLocaleString() + '\nMinecraft username: ' + username + '\nItems:\n' + cart.map(item => item.name + ' - ' + (item.server === 'practice' ? 'Practice' : 'LifeSteal') + ' - ' + money(item.price)).join('\n') + '\nTotal: ' + money(total) + '\nJoin Anna MC Discord, open a ticket, and send this invoice. Reward after verification may take up to 3 days.') + ').then(()=>showNotification(\'Invoice copied\')).catch(()=>showNotification(\'Use Print / Save PDF to keep this invoice\'))" style="background:#263244;color:white;border:0;border-radius:9px;padding:12px 16px;cursor:pointer">Copy invoice text</button></div></section>';
+        }
 
         function selectCategory(category) {
             // Fix for the previous classList.toggle error - split out the strings so they toggle correctly!
