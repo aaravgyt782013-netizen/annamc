@@ -8,7 +8,7 @@
     <title>Store | Anna MC</title>
     <meta name="title" content="Store | Anna MC">
     <meta name="description"
-        content="Support the network and unlock exclusive perks, ranks, crates, and cosmetics. Secure checkout via Stripe and PayPal.">
+        content="Support Anna MC with LifeSteal and Practice ranks, crates, keys, and cosmetics.">
     <meta name="theme-color" content="#f2ca50">
 
     <link rel="icon" type="image/x-icon" href="logo.png">
@@ -394,7 +394,7 @@
             </div>
         </div>
 
-        <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 relative overflow-visible">
+<section class="mb-8 rounded-3xl border border-cyan-400/20 bg-slate-950/80 p-5 md:p-7"><div class="flex items-center gap-4 mb-5"><img src="anna-mc-logo.svg" alt="Anna MC" class="w-14 h-14 object-contain"><div><p class="text-xs uppercase tracking-widest text-cyan-300 font-bold">ANNA MC NETWORK STORE</p><h2 class="text-2xl font-black text-white mt-1">Choose your server</h2><p class="text-sm text-zinc-400 mt-2">Select where this rank or item should be delivered.</p></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><label class="rounded-2xl border border-cyan-400/30 bg-cyan-400/5 p-4 cursor-pointer"><input type="radio" name="anna-target-server" value="lifesteal" checked class="accent-cyan-400"> <strong class="text-white">LifeSteal</strong><p class="text-xs text-zinc-400 mt-1">Survival PvP · hearts · raiding</p></label><label class="rounded-2xl border border-blue-400/30 bg-blue-400/5 p-4 cursor-pointer"><input type="radio" name="anna-target-server" value="practice" class="accent-blue-400"> <strong class="text-white">Practice</strong><p class="text-xs text-zinc-400 mt-1">Duels · PvP training · kits</p></label></div><label for="anna-minecraft-username" class="block text-xs uppercase tracking-widest text-zinc-300 font-bold mt-5 mb-2">Minecraft username</label><input id="anna-minecraft-username" maxlength="16" autocomplete="off" pattern="[A-Za-z0-9_]{3,16}" placeholder="Exact in-game username" class="w-full rounded-xl bg-black/40 border border-white/15 text-white px-4 py-3"><p class="text-xs text-zinc-500 mt-2">Payment and automatic delivery are not live until the secure payment backend and server bridge are configured.</p></section>        <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 relative overflow-visible">
             <div class="space-y-16">
                 <!-- Flash Sale Banner -->
                 <section class="mb-16">
@@ -1196,9 +1196,11 @@
                 return;
             }
 
+            const selectedServer = document.querySelector('input[name="anna-target-server"]:checked')?.value || 'lifesteal';
             cart.push({
                 name: itemName,
-                price: storeCatalog[itemName]
+                price: storeCatalog[itemName],
+                server: selectedServer
             });
             renderCart();
             showNotification(itemName + ' added to cart');
@@ -1245,12 +1247,145 @@
         }
 
         function checkoutCart() {
-            if (cart.length === 0) {
-                showNotification('No items in cart');
-                return;
-            }
+            if (cart.length === 0) { showNotification('No items in cart'); return; }
+            const input = document.getElementById('anna-minecraft-username');
+            const username = (input?.value || '').trim();
+            if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) { input?.focus(); showNotification('Enter a valid Minecraft username first'); return; }
             const total = cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
-            showNotification(`Ready to checkout $${total}`);
+            const items = cart.map(item => item.name + ' — ' + (item.server === 'practice' ? 'Practice' : 'LifeSteal')).join('\n');
+            window.alert('Anna MC order preview\n\nPlayer: ' + username + '\n' + items + '\n\nCurrent total: 
+
+        function selectCategory(category) {
+            // Fix for the previous classList.toggle error - split out the strings so they toggle correctly!
+            document.querySelectorAll('.category-tab').forEach(button => {
+                const isActive = button.dataset.category === category;
+
+                // Active CSS Classes
+                const activeClasses = ['bg-primary', 'text-black', 'shadow-[0_0_15px_rgba(242,202,80,0.3)]'];
+                // Inactive CSS Classes
+                const inactiveClasses = ['glass-panel', 'text-zinc-400', 'border-white/5', 'hover:text-white'];
+
+                if (isActive) {
+                    button.classList.add(...activeClasses);
+                    button.classList.remove(...inactiveClasses);
+                } else {
+                    button.classList.add(...inactiveClasses);
+                    button.classList.remove(...activeClasses);
+                }
+            });
+
+            document.querySelectorAll('.category-content').forEach(section => {
+                if (section.id === category) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+        }
+
+        document.querySelectorAll('[data-category]').forEach(button => {
+            button.addEventListener('click', () => selectCategory(button.dataset.category));
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            selectCategory('global-ranks');
+        });
+
+        function showNotification(message) {
+            const toast = document.getElementById('copy-toast');
+            const messageText = document.getElementById('toast-message');
+            const tmout = toast.querySelector('#timeout');
+
+            messageText.innerText = message;
+
+            toast.classList.remove('translate-y-20', 'hidden', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Re-trigger animation
+            tmout.style.animation = 'none';
+            tmout.offsetHeight; /* trigger reflow */
+            tmout.style.animation = 'progress 3s linear forwards';
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'hidden', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        function toggleMobileCart(isOpen) {
+            const drawer = document.getElementById('mobile-cart-drawer');
+            const backdrop = document.getElementById('cart-backdrop');
+            const content = document.getElementById('drawer-content');
+
+            if (isOpen) {
+                drawer.classList.remove('pointer-events-none');
+                backdrop.classList.add('opacity-100');
+                content.classList.remove('translate-x-full');
+            } else {
+                drawer.classList.add('pointer-events-none');
+                backdrop.classList.remove('opacity-100');
+                content.classList.add('translate-x-full');
+            }
+        }
+
+        function renderCart() {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const totalFormatted = `$${total.toFixed(2)}`;
+
+            // Desktop Elements
+            const cartItems = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+            const cartItemCount = document.getElementById('cart-item-count');
+            const cartTotalAmount = document.getElementById('cart-total-amount');
+            const cartGrandTotal = document.getElementById('cart-grand-total');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            // Mobile Elements
+            const mobileFab = document.getElementById('mobile-cart-fab');
+            const mobileCount = document.getElementById('mobile-cart-count');
+            const mobileItemsList = document.getElementById('mobile-cart-items-list');
+            const mobileGrandTotal = document.getElementById('mobile-cart-grand-total');
+            const mobileCheckoutBtn = document.getElementById('mobile-checkout-btn');
+
+            // Update Counts & Totals
+            [cartCount, mobileCount].forEach(el => el.innerText = cart.length);
+            [cartTotal, cartTotalAmount, cartGrandTotal, mobileGrandTotal].forEach(el => el.innerText = totalFormatted);
+            cartItemCount.innerText = `${cart.length} item${cart.length === 1 ? '' : 's'}`;
+
+            // Toggle Button States
+            checkoutButton.disabled = cart.length === 0;
+            mobileCheckoutBtn.disabled = cart.length === 0;
+
+            // Show/Hide Mobile FAB
+            if (cart.length > 0) {
+                mobileFab.classList.remove('hidden');
+            } else {
+                mobileFab.classList.add('hidden');
+                toggleMobileCart(false); // Close drawer if last item is removed
+            }
+
+            // Build Items HTML
+            const itemsHTML = cart.length === 0
+                ? '<li class="text-sm text-zinc-400 font-tech text-center py-10">Your cart is empty.</li>'
+                : cart.map((item, index) => `
+            <li class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div>
+                    <p class="text-sm font-bold text-white font-tech">${item.name}</p>
+                    <p class="text-xs text-zinc-400 font-tech">$${item.price.toFixed(2)}</p>
+                </div>
+                <button onclick="removeFromCart(${index})" class="text-xs uppercase tracking-widest text-primary font-bold font-tech">Remove</button>
+            </li>
+        `).join('');
+
+            cartItems.innerHTML = itemsHTML;
+            mobileItemsList.innerHTML = itemsHTML;
+        }
+    </script>
+</body>
+
+</html> + total + '\n\nThis is only a preview, not a paid order. Secure payment and automatic rank delivery are not configured yet.');
         }
 
         function selectCategory(category) {
