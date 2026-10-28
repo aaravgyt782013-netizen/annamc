@@ -1098,6 +1098,7 @@
       async function checkSession(){try{const r=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(r.ok){const u=await r.json();if(u.authenticated&&u.role==='owner')revealAdmin();}}catch(_){}}
       form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');submit.disabled=true;submit.textContent='Signing in…';try{const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('home-login-email').value.trim(),password:document.getElementById('home-login-password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Login failed. Please try again.');document.getElementById('home-login-password').value='';show('Signed in successfully.',false);if(String(d.email||'').toLowerCase()==='aaravg78201333@gmail.com'){revealAdmin();setTimeout(()=>{close();location.href='/admin';},450);}else{setTimeout(close,900);}}catch(err){show(err.message||'Unable to sign in. Check the server deployment.',true);}finally{submit.disabled=false;submit.textContent='Sign in securely';}});
       checkSession();
+      if(new URLSearchParams(location.search).get('login')==='1') open();
     })();
     </script>
 
