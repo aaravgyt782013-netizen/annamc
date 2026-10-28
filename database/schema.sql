@@ -68,3 +68,11 @@ CREATE INDEX IF NOT EXISTS orders_created_at_idx ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS orders_status_idx ON orders(status, delivery_status);
 CREATE INDEX IF NOT EXISTS products_active_sort_idx ON products(active, sort_order);
 CREATE INDEX IF NOT EXISTS announcements_public_idx ON announcements(active, starts_at, ends_at);
+
+-- Editable admin-managed voting links/configuration (no secret vote tokens stored here).
+CREATE TABLE IF NOT EXISTS site_settings (
+  setting_key text PRIMARY KEY,
+  setting_value jsonb NOT NULL DEFAULT '{}'::jsonb,
+  updated_by text NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
