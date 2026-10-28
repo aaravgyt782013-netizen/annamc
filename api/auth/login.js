@@ -14,7 +14,7 @@ module.exports = async function handler(req, res) {
 
     // Owner authentication does not depend on Neon being available.
     if (email === ownerEmail) {
-      if (!ownerPassword) return send(res, 503, { error: "Set ANNA_ADMIN_PASSWORD in the deployment environment, then redeploy." });
+      if (!ownerPassword) return send(res, 503, { error: "Set ANNA_ADMIN_PASSWORD in Antideploy environment variables, then redeploy." });
       authorized = safeEqual(password, ownerPassword);
     } else {
       const pool = db();
@@ -40,6 +40,6 @@ module.exports = async function handler(req, res) {
     return send(res, 200, { ok: true, email, csrf, expiresIn: 28800 });
   } catch (e) {
     console.error("admin login failed:", e.message);
-    return send(res, 503, { error: e.message.includes("ANNA_SESSION_SECRET") ? "ANNA_SESSION_SECRET is missing or too short. Set a random secret of at least 32 characters in Vercel and redeploy." : "Login backend failed. Check Vercel Runtime Logs; confirm DATABASE_URL and ANNA_SESSION_SECRET are configured." });
+    return send(res, 503, { error: e.message.includes("ANNA_SESSION_SECRET") ? "ANNA_SESSION_SECRET is missing or too short. Set a random secret of at least 32 characters in Antideploy environment variables and redeploy." : "Login backend failed. Check Antideploy deployment logs; confirm DATABASE_URL and ANNA_SESSION_SECRET are configured." });
   }
 };
