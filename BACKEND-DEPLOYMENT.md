@@ -35,3 +35,6 @@ Generate a bcrypt hash locally in a trusted environment using a password manager
 4. Only after test payments, duplicate webhook tests, failed delivery/retry tests and server mapping checks pass should live payments or automatic rewards be enabled.
 
 Never expose database, payment, session or delivery secrets in browser code or commit them to Git.
+The active catalogue is also available from `GET /api/products` (INR amounts in integer paise). The current `store.html` UI has not yet been switched to render this API, so edits in the admin catalogue do not automatically change the displayed store cards until that frontend wiring is completed.
+
+The code has been committed to GitHub but has not been deployed against your Neon/Vercel environment or live-tested from this chat. Treat deployment, login, database connectivity and all integration tests as pending until you run the verification checklist above.
