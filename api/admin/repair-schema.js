@@ -35,9 +35,15 @@ module.exports=async function handler(req,res){
  if(!requireRole(user,["owner"],res))return;
  try{
   const pool=db();
-  await pool.query("BEGIN");
-  try{for(const sql of statements)await pool.query(sql);await pool.query("COMMIT")}
-  catch(e){await pool.query("ROLLBACK");throw e}
+  const client=await pool.connect();
+  try{
+   await client.query("BEGIN");
+   for(const sql of statements) await client.query(sql);
+   await client.query("COMMIT");
+  }catch(e){
+   try{await client.query("ROLLBACK")}catch{}
+   throw e;
+  }finally{client.release()}
   try{await audit(user,"database.schema.repair","database","schema",{statements:statements.length})}catch(e){console.error("schema repair audit failed",e.message)}
   const names=["products","orders","announcements","staff_users","audit_logs","site_settings","game_modes","login_attempts"];
   const result=await pool.query("SELECT name,to_regclass('public.'||name) IS NOT NULL AS present FROM unnest($1::text[]) AS name",[names]);
