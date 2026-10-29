@@ -1259,9 +1259,22 @@
                     });
                 }
             } catch (error) {
-                console.warn('Using fallback INR store catalogue:', error && error.message || 'unavailable');
-                const note = document.getElementById('store-catalogue-notice');
-                if (note) note.textContent = 'Live catalogue unavailable. Prices may be outdated; please retry before placing an order.';
+                console.warn('Managed store catalogue unavailable:', error && error.message || 'unavailable');
+                // Never expose stale hard-coded prices when the live catalogue cannot be verified.
+                document.querySelectorAll('.store-card').forEach(card => { card.hidden = true; });
+                const grid = document.querySelector('.store-card')?.parentElement;
+                let emptyNotice = document.getElementById('store-catalogue-empty');
+                if (!emptyNotice && grid) {
+                    emptyNotice = document.createElement('div');
+                    emptyNotice.id = 'store-catalogue-empty';
+                    emptyNotice.className = 'glass-panel rounded-3xl border border-white/10 p-8 md:p-12 text-center my-6';
+                    grid.parentElement.insertBefore(emptyNotice, grid.nextSibling);
+                }
+                if (grid) grid.hidden = true;
+                if (emptyNotice) {
+                    emptyNotice.hidden = false;
+                    emptyNotice.innerHTML = '<div class="text-primary text-3xl mb-3">✦</div><h3 class="text-xl md:text-2xl font-black text-white font-minecraft mb-3">STORE TEMPORARILY UNAVAILABLE</h3><p class="text-zinc-400 font-tech">We cannot verify the live catalogue right now. Please check back later.</p>';
+                }
             }
         }
         loadManagedStoreCatalog();
