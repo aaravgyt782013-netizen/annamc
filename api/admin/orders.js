@@ -1,4 +1,5 @@
 const { db, send, method, requireAdmin, requireRole, audit, parseBody } = require("../../lib/server");
+async function safeAudit(...args){try{await audit(...args)}catch(e){console.error("audit logging failed:",e.message)}}
 function friendlyAdminError(e, label){
  if(e?.code==="42P01"||e?.code==="42703")return label+" database table/column is missing or outdated. Run the latest database/schema.sql in your database SQL editor, then retry.";
  if(e?.code==="23505")return "This "+label.toLowerCase()+" already exists. Refresh the panel and check for a duplicate.";
@@ -24,12 +25,12 @@ module.exports = async function handler(req,res) {
       if(!/^[0-9a-f-]{36}$/i.test(id)||notes.length>2000)return send(res,400,{error:"Valid order id and support_notes (max 2000 characters) required"});
       const result=await pool.query("UPDATE orders SET support_notes=$2,updated_at=now() WHERE id=$1 RETURNING id,support_notes",[id,notes]);
       if(!result.rowCount)return send(res,404,{error:"Order not found"});
-      await audit(user,"order.notes.update","order",id); return send(res,200,{order:result.rows[0]});
+      await safeAudit(user,"order.notes.update","order",id); return send(res,200,{order:result.rows[0]});
     }
     const body=parseBody(req); const id=String(body.id||""); const notes=String(body.support_notes||"");
     if(!/^[0-9a-f-]{36}$/i.test(id)||notes.length>2000)return send(res,400,{error:"Valid order id and support_notes (max 2000 characters) required"});
     const result=await pool.query("UPDATE orders SET support_notes=$2,updated_at=now() WHERE id=$1 RETURNING id,support_notes",[id,notes]);
     if(!result.rowCount)return send(res,404,{error:"Order not found"});
-    await audit(user,"order.notes.update","order",id); return send(res,200,{order:result.rows[0]});
+    await safeAudit(user,"order.notes.update","order",id); return send(res,200,{order:result.rows[0]});
   }catch(e){return send(res,500,{error:friendlyAdminError(e,"Order")});}
 };
