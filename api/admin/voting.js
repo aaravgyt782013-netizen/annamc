@@ -1,4 +1,5 @@
 const {db,send,method,requireAdmin,requireRole,audit,parseBody}=require("../../lib/server");
+async function safeAudit(...args){try{await audit(...args)}catch(e){console.error("audit logging failed:",e.message)}}
 const KEY="voting_config";
 const DEFAULT={enabled:true,heading:"Vote for Anna MC",voteKeyName:"Vote Key for Legend Key",links:[],notes:"Vote on the sites below to support Anna MC."};
 function normalize(v){
@@ -30,7 +31,7 @@ module.exports=async function handler(req,res){
   const body=parseBody(req);
   let config;try{config=normalize(body.config)}catch(e){return send(res,400,{error:e.message})}
   await pool.query("INSERT INTO site_settings(setting_key,setting_value,updated_by,updated_at) VALUES($1,$2::jsonb,$3,now()) ON CONFLICT(setting_key) DO UPDATE SET setting_value=EXCLUDED.setting_value,updated_by=EXCLUDED.updated_by,updated_at=now()",[KEY,JSON.stringify(config),user.email]);
-  await audit(user,"voting.config.update","site_settings",KEY,{linkCount:config.links.length,enabled:config.enabled});
+  await safeAudit(user,"voting.config.update","site_settings",KEY,{linkCount:config.links.length,enabled:config.enabled});
   return send(res,200,{ok:true,config});
  }catch(e){console.error("voting config API",e.message);return send(res,500,{error:"Voting settings unavailable. Ensure the updated database/schema.sql has been run in Neon."})}
 };
