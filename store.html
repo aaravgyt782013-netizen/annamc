@@ -1186,6 +1186,17 @@
                 if (!Array.isArray(data.products)) throw new Error('Invalid catalogue');
                 const activeProducts = data.products;
                 const activeById = new Map(activeProducts.map(p => [String(p.id), p]));
+                let emptyNotice = document.getElementById('store-catalogue-empty');
+                const productGrid = document.querySelector('.store-card')?.parentElement;
+                if (!emptyNotice && productGrid) {
+                    emptyNotice = document.createElement('div');
+                    emptyNotice.id = 'store-catalogue-empty';
+                    emptyNotice.className = 'glass-panel rounded-3xl border border-white/10 p-8 md:p-12 text-center my-6';
+                    emptyNotice.innerHTML = '<div class="text-primary text-3xl mb-3">✦</div><h3 class="text-xl md:text-2xl font-black text-white font-minecraft mb-3">THE STORE IS BEING RESTOCKED</h3><p class="text-zinc-400 font-tech">New Anna MC items will appear here soon.</p>';
+                    productGrid.parentElement.insertBefore(emptyNotice, productGrid.nextSibling);
+                }
+                if (emptyNotice) emptyNotice.hidden = activeProducts.length > 0;
+                if (productGrid) productGrid.hidden = activeProducts.length === 0;
                 const renderedIds = new Set();
 
                 document.querySelectorAll('.store-card').forEach(card => {
