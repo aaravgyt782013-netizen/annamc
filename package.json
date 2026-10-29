@@ -6,7 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "check": "node --check server.js && node --check lib/server.js && node --check api/auth/login.js && node --check api/auth/me.js && node --check api/auth/logout.js && node --check api/admin/products.js && node --check api/admin/orders.js && node --check api/admin/announcements.js",
+    "check": "node --check server.js && node --check lib/server.js && node --check api/auth/login.js && node --check api/auth/me.js && node --check api/auth/logout.js && node --check api/admin/products.js && node --check api/admin/orders.js && node --check api/admin/announcements.js && node --check api/admin/gamemodes.js",
     "start": "node server.js"
   },
   "dependencies": {
