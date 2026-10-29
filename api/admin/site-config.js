@@ -8,7 +8,7 @@ function validateConfig(value){
  const theme=value.theme||{};
  if(typeof theme!=="object"||Array.isArray(theme))throw new Error("theme must be an object of CSS custom properties.");
  for(const [key,val] of Object.entries(theme)){
-  if(!/^--[a-zA-Z0-9_-]{1,60}$/.test(key)||typeof val!=="string"||val.length>120||/[;{}<>]/.test(val))throw new Error("Invalid theme property or value: "+key);
+  if((!/^--[a-zA-Z0-9_-]{1,60}$/.test(key)&&!["primary","secondary","tertiary","background","surface"].includes(key))||typeof val!=="string"||val.length>120||/[;{}<>]/.test(val))throw new Error("Invalid theme property or value: "+key);
   config.theme[key]=val;
  }
  const text=value.textOverrides||{};
