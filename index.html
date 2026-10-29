@@ -1123,6 +1123,9 @@
     })();
     </script>
 
+<script>
+(async()=>{try{const response=await fetch("/api/site-config",{credentials:"same-origin",cache:"no-store"});if(!response.ok)return;const data=await response.json(),config=data.config||{};for(const [key,value] of Object.entries(config.theme||{})){if(/^--[a-zA-Z0-9_-]{1,60}$/.test(key)&&typeof value==="string"&&!/[;{}<>]/.test(value))document.documentElement.style.setProperty(key,value)}for(const [selector,value] of Object.entries(config.textOverrides||{})){if(typeof value!=="string")continue;try{document.querySelectorAll(selector).forEach(el=>{el.textContent=value})}catch{}}for(const selector of config.hideSelectors||[]){if(typeof selector!=="string")continue;try{document.querySelectorAll(selector).forEach(el=>{el.hidden=true;el.setAttribute("aria-hidden","true")})}catch{}}}catch(e){console.warn("Website overrides unavailable",e)}})();
+</script>
 </body>
 
 </html>
