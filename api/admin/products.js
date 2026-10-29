@@ -1,5 +1,5 @@
 const { db, send, method, requireAdmin, requireRole, audit, parseBody } = require("../../lib/server");
-const validId = v => typeof v === "string" && /^[a-z0-9][a-z0-9_-]{1,63}$/.test(v);
+const validId = v => typeof v === "string" && /^[a-z0-9][a-z0-9_-]{1,63}$/.test(v);\nasync function safeAudit(...args) { try { await audit(...args); } catch (e) { console.error("products audit log failed:", e.message); } }\nfunction friendlyDatabaseError(e) {\n  if (e?.code === "42P01" || e?.code === "42703") return "Database schema is missing or outdated. Run the latest database/schema.sql in your database SQL editor, then retry.";\n  if (e?.code === "23505") return "A product with this ID already exists. Edit the existing product or choose a different Product ID.";\n  if (e?.code === "23514" || e?.code === "22P02" || e?.code === "22003") return "Some product fields are not accepted by the database. Check the server, price, ID, and rank group values.";\n  if (!process.env.DATABASE_URL) return "DATABASE_URL is missing from the deployment environment variables.";\n  if (e?.code === "28P01" || e?.code === "3D000" || e?.code === "08001" || e?.code === "08006") return "The database connection failed. Check DATABASE_URL and database access settings in the deployment.";\n  console.error("products API failure:", e?.code || "no-code", e?.message || e);\n  return "Product operation failed because the server or database rejected the request. Check the deployment logs for the detailed cause.";\n}
 module.exports = async function handler(req, res) {
   if (!method(req, res, ["GET","POST","PATCH","DELETE"])) return;
   const user = await requireAdmin(req, res); if (!user) return;
@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
       return send(res, 200, { products: result.rows });
     }
     const body = parseBody(req);
-    if (req.method === "DELETE" && String(req.query?.id || "") === "all") { if (user.role !== "owner") return send(res,403,{error:"Only the owner can clear the catalogue"}); const result = await pool.query("UPDATE products SET active=false,updated_at=now() WHERE active=true"); await audit(user,"product.archive_all","product",null,{archived:result.rowCount}); return send(res,200,{ok:true,archived:result.rowCount}); }
+    if (req.method === "DELETE" && String(req.query?.id || "") === "all") { if (user.role !== "owner") return send(res,403,{error:"Only the owner can clear the catalogue"}); const result = await pool.query("UPDATE products SET active=false,updated_at=now() WHERE active=true"); await safeAudit(user,"product.archive_all","product",null,{archived:result.rowCount}); return send(res,200,{ok:true,archived:result.rowCount}); }
     if (req.method === "POST") {
       const { id,name,description="",price_paise,target_server,rank_group,active=true,sort_order=100 } = body;
       if (!validId(id) || typeof name !== "string" || !name.trim() || name.length > 100 || typeof description !== "string" || description.length > 2000 || !Number.isSafeInteger(price_paise) || price_paise < 0 || !["lifesteal","practice"].includes(target_server) || typeof rank_group !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(rank_group)) return send(res,400,{error:"Invalid product fields. Price must be integer paise; target_server must be lifesteal, practice or both."});
@@ -43,5 +43,5 @@ module.exports = async function handler(req, res) {
     if (!result.rowCount) return send(res,404,{error:"Product not found"});
     await audit(user,"product.update","product",id,{fields:fields.filter(f=>Object.prototype.hasOwnProperty.call(body,f))});
     return send(res,200,{product:result.rows[0]});
-  } catch(e) { console.error("products API",e.message); return send(res,500,{error:"Product operation failed"}); }
+  } catch(e) { return send(res,500,{error:friendlyDatabaseError(e)}); }
 };
