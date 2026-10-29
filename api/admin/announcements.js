@@ -1,4 +1,13 @@
 const { db, send, method, requireAdmin, requireRole, audit, parseBody } = require("../../lib/server");
+function friendlyAdminError(e, label){
+ if(e?.code==="42P01"||e?.code==="42703")return label+" database table/column is missing or outdated. Run the latest database/schema.sql in your database SQL editor, then retry.";
+ if(e?.code==="23505")return "This "+label.toLowerCase()+" already exists. Refresh the panel and check for a duplicate.";
+ if(e?.code==="23514"||e?.code==="22P02"||e?.code==="22003")return "The database rejected one or more fields. Check the values and try again.";
+ if(!process.env.DATABASE_URL)return "DATABASE_URL is missing from the deployment environment variables.";
+ if(e?.code==="28P01"||e?.code==="3D000"||e?.code==="08001"||e?.code==="08006")return "Database connection failed. Check DATABASE_URL and database access settings in Antideploy.";
+ console.error(label+" API failure:",e?.code||"no-code",e?.message||e);
+ return label+" could not be saved. The server or database rejected the request; check deployment logs for the detailed cause.";
+}
 module.exports = async function handler(req,res) {
   if(!method(req,res,["GET","POST","PATCH","DELETE"]))return;
   const user=await requireAdmin(req,res);if(!user)return;
@@ -23,5 +32,5 @@ module.exports = async function handler(req,res) {
     const result=await pool.query("UPDATE announcements SET "+sets.join(",")+" WHERE id=$1 RETURNING *",values);
     if(!result.rowCount)return send(res,404,{error:"Announcement not found"});
     await audit(user,"announcement.update","announcement",id);return send(res,200,{announcement:result.rows[0]});
-  }catch(e){console.error("announcements API",e.message);return send(res,500,{error:"Announcement operation failed"});}
+  }catch(e){return send(res,500,{error:friendlyAdminError(e,"Announcement")});}
 };
