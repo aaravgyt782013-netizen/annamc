@@ -18,6 +18,8 @@ const statements = [
   `ALTER TABLE products ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 100`,
   `ALTER TABLE products ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now()`,
   `ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now()`,
+  `ALTER TABLE products DROP CONSTRAINT IF EXISTS products_target_server_check`,
+  `ALTER TABLE products ADD CONSTRAINT products_target_server_check CHECK(target_server IN ('lifesteal','practice','both'))`,
   `ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_by text NOT NULL DEFAULT 'owner'`,
   `ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now()`,
   `CREATE INDEX IF NOT EXISTS orders_created_at_idx ON orders(created_at DESC)`,
