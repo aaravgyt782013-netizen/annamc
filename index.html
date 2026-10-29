@@ -316,9 +316,10 @@
         <div class="absolute inset-0 h-32 header-gradient pointer-events-none"></div>
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 relative">
             <nav class="glass-panel flex items-center justify-between px-4 md:px-6 py-3 rounded-2xl border-white/5 shadow-2xl">
-                <a href="index.html" class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3 shrink-0">
                     <img loading="lazy" src="anna-mc-logo.svg" class="h-8 md:h-10" alt="Anna MC logo">
                 </a>
+                <span id="account-name" class="hidden max-w-[8rem] md:max-w-[13rem] truncate rounded-full border border-primary/30 bg-primary/10 px-3 py-2 text-[10px] md:text-xs font-tech font-bold tracking-wider text-primary" aria-live="polite"></span>
                 <div class="hidden xl:flex items-center gap-6 header-nav">
                     <a href="index.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Home</a>
                     <a href="store.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Store</a>
@@ -329,7 +330,9 @@
                 </div>
                 <div class="hidden lg:flex items-center gap-3">
                     <button type="button" data-open-login class="px-4 py-2 text-zinc-400 hover:text-white font-tech font-bold text-xs tracking-widest uppercase transition-colors">Login</button>
-                    <a href="register.html" class="px-4 py-2 bg-white/5 text-white border border-white/10 rounded-xl text-xs font-tech font-bold tracking-widest uppercase hover:bg-white/10 transition-colors">Register</a><a id="desktop-admin-link" href="/admin" class="hidden px-4 py-2 bg-primary text-on-primary rounded-xl text-xs font-tech font-bold tracking-widest uppercase">Admin Panel</a>
+                    <a data-register-link href="register.html" class="px-4 py-2 bg-white/5 text-white border border-white/10 rounded-xl text-xs font-tech font-bold tracking-widest uppercase hover:bg-white/10 transition-colors">Register</a>
+                    <button type="button" data-sign-out class="hidden px-4 py-2 text-zinc-400 hover:text-white font-tech font-bold text-xs tracking-widest uppercase">Sign out</button>
+                    <a id="desktop-admin-link" href="/admin" class="hidden px-4 py-2 bg-primary text-on-primary rounded-xl text-xs font-tech font-bold tracking-widest uppercase">Admin Panel</a>
                 </div>
                 <button id="mobile-menu-toggle" class="xl:hidden p-2 rounded-2xl border border-white/10 text-white/80 hover:text-white" aria-label="Toggle navigation">
                     <span class="material-symbols-outlined">menu</span>
@@ -344,8 +347,10 @@
                     <a href="forums.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Forums</a>
                     <a href="wiki.html" class="nav-link text-white/70 hover:text-white font-tech font-bold text-sm tracking-widest uppercase">Wiki</a>
                     <div class="pt-3 border-t border-white/10 mt-3 flex flex-col gap-2">
-                        <button type="button" data-open-login class="px-4 py-3 bg-white/5 text-white rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-white/10">Login</button><a id="mobile-admin-link" href="/admin" class="hidden px-4 py-3 bg-primary text-on-primary rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center">Admin Panel</a>
-                        <a href="register.html" class="px-4 py-3 bg-primary text-on-primary rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-primary-fixed">Register</a>
+                        <button type="button" data-open-login class="px-4 py-3 bg-white/5 text-white rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-white/10">Login</button>
+                        <button type="button" data-sign-out class="hidden px-4 py-3 bg-white/5 text-white rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center">Sign out</button>
+                        <a id="mobile-admin-link" href="/admin" class="hidden px-4 py-3 bg-primary text-on-primary rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center">Admin Panel</a>
+                        <a data-register-link href="register.html" class="px-4 py-3 bg-primary text-on-primary rounded-2xl text-xs font-tech font-bold uppercase tracking-widest text-center hover:bg-primary-fixed">Register</a>
                     </div>
                 </div>
             </div>
@@ -1094,9 +1099,25 @@
       document.getElementById('home-login-close').addEventListener('click',close);
       modal.addEventListener('click',e=>{if(e.target===modal)close();});
       document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
-      const revealAdmin=()=>{document.getElementById('desktop-admin-link')?.classList.remove('hidden');document.getElementById('mobile-admin-link')?.classList.remove('hidden');document.querySelectorAll('[data-open-login]').forEach(b=>b.textContent='Account');};
-      async function checkSession(){try{const r=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(r.ok){const u=await r.json();if(u.authenticated&&u.role==='owner')revealAdmin();}}catch(_){}}
-      form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');submit.disabled=true;submit.textContent='Signing in…';try{const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('home-login-email').value.trim(),password:document.getElementById('home-login-password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Login failed. Please try again.');document.getElementById('home-login-password').value='';show('Signed in successfully.',false);if(String(d.email||'').toLowerCase()==='aaravg78201333@gmail.com'){revealAdmin();setTimeout(()=>{close();location.href='/admin';},450);}else{setTimeout(close,900);}}catch(err){show(err.message||'Unable to sign in. Check the server deployment.',true);}finally{submit.disabled=false;submit.textContent='Sign in securely';}});
+      const displayName=email=>{const local=String(email||'').split('@')[0]||'Account';return local.replace(/[._-]+/g,' ').replace(/\\b\\w/g,c=>c.toUpperCase());};
+      function setSignedIn(user){
+        const email=String(user.email||'');const owner=String(user.role||'').toLowerCase()==='owner'||email.toLowerCase()==='aaravg78201333@gmail.com';
+        const name=document.getElementById('account-name');name.textContent=displayName(email);name.classList.remove('hidden');
+        document.querySelectorAll('[data-open-login],[data-register-link]').forEach(el=>el.classList.add('hidden'));
+        document.querySelectorAll('[data-sign-out]').forEach(el=>el.classList.remove('hidden'));
+        document.getElementById('desktop-admin-link')?.classList.toggle('hidden',!owner);
+        document.getElementById('mobile-admin-link')?.classList.toggle('hidden',!owner);
+      }
+      function setSignedOut(){
+        document.getElementById('account-name')?.classList.add('hidden');
+        document.querySelectorAll('[data-open-login],[data-register-link]').forEach(el=>el.classList.remove('hidden'));
+        document.querySelectorAll('[data-sign-out]').forEach(el=>el.classList.add('hidden'));
+        document.getElementById('desktop-admin-link')?.classList.add('hidden');
+        document.getElementById('mobile-admin-link')?.classList.add('hidden');
+      }
+      async function checkSession(){try{const r=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(r.ok){const u=await r.json();if(u.authenticated)setSignedIn(u);else setSignedOut();}else setSignedOut();}catch(_){setSignedOut();}}
+      document.querySelectorAll('[data-sign-out]').forEach(button=>button.addEventListener('click',async()=>{try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});}catch(_){}setSignedOut();close();}));
+      form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');submit.disabled=true;submit.textContent='Signing in…';try{const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('home-login-email').value.trim(),password:document.getElementById('home-login-password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Login failed. Please try again.');document.getElementById('home-login-password').value='';setSignedIn({email:d.email,role:String(d.email||'').toLowerCase()==='aaravg78201333@gmail.com'?'owner':'user'});show('Signed in successfully.',false);setTimeout(close,700);}catch(err){show(err.message||'Unable to sign in. Check the server deployment.',true);}finally{submit.disabled=false;submit.textContent='Sign in securely';}});
       checkSession();
       if(new URLSearchParams(location.search).get('login')==='1') open();
     })();
