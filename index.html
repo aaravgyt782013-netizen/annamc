@@ -1090,7 +1090,7 @@
     </div>
     <script>
     (function(){
-      const modal=document.getElementById('home-login-modal'), form=document.getElementById('home-login-form');
+      const modal=document.getElementById('home-login-modal'), form=document.getElementById('home-login-form');let currentCsrf='';
       const msg=document.getElementById('home-login-message'), submit=document.getElementById('home-login-submit');
       const show=(text,bad)=>{msg.textContent=text;msg.classList.remove('hidden');msg.style.background=bad?'rgba(127,29,29,.5)':'rgba(22,101,52,.35)';msg.style.color=bad?'#fecaca':'#bbf7d0';};
       const open=()=>{modal.classList.remove('hidden');document.getElementById('home-login-email').focus();};
@@ -1099,9 +1099,9 @@
       document.getElementById('home-login-close').addEventListener('click',close);
       modal.addEventListener('click',e=>{if(e.target===modal)close();});
       document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
-      const displayName=email=>{const local=String(email||'').split('@')[0]||'Account';return local.replace(/[._-]+/g,' ').replace(/\\b\\w/g,c=>c.toUpperCase());};
+      const displayName=email=>{const normalized=String(email||'').toLowerCase();if(normalized==='aaravg78201333@gmail.com')return 'Aarav';const local=(normalized.split('@')[0]||'Account').replace(/[0-9]+$/,'').replace(/[._-]+/g,' ').trim()||'Account';return local.replace(/\\b\\w/g,c=>c.toUpperCase());};
       function setSignedIn(user){
-        const email=String(user.email||'');const owner=String(user.role||'').toLowerCase()==='owner'||email.toLowerCase()==='aaravg78201333@gmail.com';
+        const email=String(user.email||'');currentCsrf=String(user.csrf||currentCsrf||'');const owner=String(user.role||'').toLowerCase()==='owner'||email.toLowerCase()==='aaravg78201333@gmail.com';
         const name=document.getElementById('account-name');name.textContent=displayName(email);name.classList.remove('hidden');
         document.querySelectorAll('[data-open-login],[data-register-link]').forEach(el=>el.classList.add('hidden'));
         document.querySelectorAll('[data-sign-out]').forEach(el=>el.classList.remove('hidden'));
@@ -1116,8 +1116,8 @@
         document.getElementById('mobile-admin-link')?.classList.add('hidden');
       }
       async function checkSession(){try{const r=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(r.ok){const u=await r.json();if(u.authenticated)setSignedIn(u);else setSignedOut();}else setSignedOut();}catch(_){setSignedOut();}}
-      document.querySelectorAll('[data-sign-out]').forEach(button=>button.addEventListener('click',async()=>{try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});}catch(_){}setSignedOut();close();}));
-      form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');submit.disabled=true;submit.textContent='Signing in…';try{const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('home-login-email').value.trim(),password:document.getElementById('home-login-password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Login failed. Please try again.');document.getElementById('home-login-password').value='';setSignedIn({email:d.email,role:String(d.email||'').toLowerCase()==='aaravg78201333@gmail.com'?'owner':'user'});show('Signed in successfully.',false);setTimeout(close,700);}catch(err){show(err.message||'Unable to sign in. Check the server deployment.',true);}finally{submit.disabled=false;submit.textContent='Sign in securely';}});
+      document.querySelectorAll('[data-sign-out]').forEach(button=>button.addEventListener('click',async()=>{try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},headers:{'Content-Type':'application/json','X-CSRF-Token':currentCsrf},body:'{}'});}catch(_){}currentCsrf='';setSignedOut();close();}));
+      form.addEventListener('submit',async e=>{e.preventDefault();msg.classList.add('hidden');submit.disabled=true;submit.textContent='Signing in…';try{const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('home-login-email').value.trim(),password:document.getElementById('home-login-password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Login failed. Please try again.');document.getElementById('home-login-password').value='';setSignedIn({email:d.email,csrf:d.csrf,role:String(d.email||'').toLowerCase()==='aaravg78201333@gmail.com'?'owner':'user'});show('Signed in successfully.',false);setTimeout(close,700);}catch(err){show(err.message||'Unable to sign in. Check the server deployment.',true);}finally{submit.disabled=false;submit.textContent='Sign in securely';}});
       checkSession();
       if(new URLSearchParams(location.search).get('login')==='1') open();
     })();
