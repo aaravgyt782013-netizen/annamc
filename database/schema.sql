@@ -98,3 +98,19 @@ CREATE TABLE IF NOT EXISTS game_modes (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS game_modes_active_sort_idx ON game_modes(active, sort_order, name);
+
+
+-- Admin-managed game modes. Starts empty: no default modes are inserted.
+CREATE TABLE IF NOT EXISTS game_modes (
+  id text PRIMARY KEY,
+  name text NOT NULL,
+  description text NOT NULL DEFAULT '',
+  server_address text NOT NULL DEFAULT '',
+  version text NOT NULL DEFAULT '1.21.x',
+  status text NOT NULL DEFAULT 'online' CHECK (status IN ('online','maintenance','offline')),
+  active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 100,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS game_modes_active_sort_idx ON game_modes(active, sort_order, name);
