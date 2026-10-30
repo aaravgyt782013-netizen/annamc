@@ -125,6 +125,17 @@
       }
     }
     const socials=content.social||{},socialLinks=Object.entries(socials).filter(([,url])=>safeUrl(url));
+    if(footerNode&&content.site?.tagline){
+      const brandLogo=footerNode.querySelector('img[src*="anna-mc-logo"],img[data-cms-logo]');
+      const brandBlock=brandLogo?.parentElement?.parentElement;
+      if(brandBlock&&!brandBlock.querySelector(".anna-cms-brand-tagline")){
+        const tagline=document.createElement("p");tagline.className="anna-cms-brand-tagline";tagline.textContent=content.site.tagline;
+        const copyright=brandBlock.querySelector("[data-cms-footer-copyright]")?.parentElement;
+        if(copyright)brandBlock.insertBefore(tagline,copyright);else brandBlock.appendChild(tagline);
+        const style=document.createElement("style");style.textContent=".anna-cms-brand-tagline{margin:-4px 0 10px;color:#aaa;font:500 12px/1.5 Inter,system-ui,sans-serif;letter-spacing:.04em}";
+        document.head.appendChild(style);
+      }
+    }
     if(footerNode&&content.footer?.contactEmail&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(content.footer.contactEmail)&&!footerNode.querySelector(".anna-cms-contact-email")){const contact=document.createElement("a");contact.className="anna-cms-contact-email";contact.href="mailto:"+content.footer.contactEmail;contact.textContent=content.footer.contactEmail;footerNode.appendChild(contact);const style=document.createElement("style");style.textContent=".anna-cms-contact-email{display:block;text-align:center;padding:0 16px 18px;color:#aaa;font:12px Inter,system-ui,sans-serif;text-decoration:none}";document.head.appendChild(style);}\n    if(footerNode&&socialLinks.length&&!footerNode.querySelector(".anna-cms-socials")){
       const row=document.createElement("div");row.className="anna-cms-socials";
       for(const [name,url] of socialLinks){const a=document.createElement("a");a.href=safeUrl(url);a.target="_blank";a.rel="noopener noreferrer";a.textContent=name==="x"?"X":name.charAt(0).toUpperCase()+name.slice(1);row.appendChild(a);}
