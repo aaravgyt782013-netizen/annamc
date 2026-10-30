@@ -38,7 +38,7 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
 <button data-view="announcements"><span class="ico">◉</span>Announcements</button>
 <button data-view="gamemodes" class="owner-only"><span class="ico">⚔</span>Game modes</button>
 <button data-view="voting" class="owner-only"><span class="ico">↗</span>Voting & links</button>
-<button data-view="website" class="owner-only"><span class="ico">◐</span>Website & theme</button>
+<button data-view="website" class="owner-only"><span class="ico">◐</span>Website CMS</button>
 <button data-view="staff" class="owner-only"><span class="ico">♙</span>Staff access</button>
 <button data-view="audit" class="owner-only"><span class="ico">≡</span>Activity log</button>
 </nav></div>
@@ -89,10 +89,109 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
 <form id="votingForm"><div class="grid"><div class="field full"><label><input id="voteEnabled" type="checkbox" checked> Voting section enabled</label></div><div class="field"><label for="voteHeading">Section heading</label><input id="voteHeading" maxlength="120" required></div><div class="field"><label for="voteKeyName">Reward label</label><input id="voteKeyName" maxlength="80" required></div><div class="field full"><label for="voteNotes">Description / instructions</label><textarea id="voteNotes" rows="3" maxlength="1000"></textarea></div><div class="field full"><label for="voteLinks">Vote links (JSON list)</label><textarea id="voteLinks" class="code" rows="10" spellcheck="false" autocapitalize="off" required>[]</textarea><p class="note">Each item: {"label":"Vote site","url":"https://example.com","active":true}. Use valid HTTPS URLs only.</p></div></div><div class="form-actions"><button class="button primary" type="submit">Save voting settings</button><button class="button danger" type="button" id="clearVoting">Clear links & disable voting</button></div></form><div id="votingPreview" style="margin-top:18px"></div></div>
 </section>
 <section class="section owner-only" id="view-website">
-<div class="card"><div class="card-head"><div><h2>Brand & theme</h2><p class="muted">Set the core brand colors used by public pages, then save. This updates supported theme tokens; unsupported hard-coded elements may need a dedicated editor.</p></div><button class="button ghost" id="reloadSiteConfig">Reload</button></div><div class="color-row" id="themeColors">
-<div class="color-field"><label for="themePrimary">Primary / gold</label><input id="themePrimary" type="color" value="#e6c34f"></div><div class="color-field"><label for="themeSecondary">Secondary</label><input id="themeSecondary" type="color" value="#171719"></div><div class="color-field"><label for="themeTertiary">Tertiary</label><input id="themeTertiary" type="color" value="#f5dd83"></div><div class="color-field"><label for="themeBackground">Background</label><input id="themeBackground" type="color" value="#0a0a0c"></div><div class="color-field"><label for="themeSurface">Surface</label><input id="themeSurface" type="color" value="#19191d"></div></div><div class="form-actions"><button class="button primary" id="saveTheme" type="button">Save theme colors</button></div></div>
-<div class="card"><div class="card-head"><div><h2>Advanced website configuration</h2><p class="muted">CSS selector-based text overrides, extra theme tokens, and hide rules. Saved changes apply on public pages that load the site configuration script.</p></div></div><div class="field"><label for="siteConfigJson">Configuration JSON</label><textarea id="siteConfigJson" class="code" rows="16" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea><p class="note">Structure: {"theme":{"primary":"#e6c34f","--custom-token":"value"},"textOverrides":{"h1":"New heading"},"hideSelectors":[".old-banner"]}. Text overrides replace the matched element's text content.</p></div><div class="form-actions"><button class="button primary" id="saveSiteConfig" type="button">Save advanced settings</button><button class="button ghost" id="formatSiteConfig" type="button">Format JSON</button></div></div>
-<div class="notice info">This editor controls theme tokens and selector overrides, not every image, navigation item, section layout, or all page copy. Those need explicit editable fields and rendering support in each public page.</div>
+<div class="card">
+ <div class="card-head"><div><h2>Website CMS · Content studio</h2><p class="muted">Control the public website from here. Saved settings are stored in the database and rendered by the live site; you do not need to edit HTML for these fields.</p></div><div class="actions"><button class="button ghost" type="button" id="reloadWebsiteContent">↻ Reload</button><button class="button" type="button" id="previewWebsiteContent">↗ Preview site</button></div></div>
+ <div id="cmsSaveStatus" class="notice info">Loading website content…</div>
+ <form id="websiteContentForm">
+  <h3>Brand identity & global settings</h3>
+  <div class="grid">
+   <div class="field"><label for="cmsSiteName">Website / network name</label><input id="cmsSiteName" data-content-path="site.name" maxlength="80" placeholder="Anna MC"></div>
+   <div class="field"><label for="cmsTagline">Brand tagline</label><input id="cmsTagline" data-content-path="site.tagline" maxlength="140" placeholder="Ascend to Eternity"></div>
+   <div class="field"><label for="cmsLogo">Logo image URL or /path</label><input id="cmsLogo" data-content-path="site.logoUrl" placeholder="/anna-mc-logo.svg"></div>
+   <div class="field"><label for="cmsFavicon">Favicon URL or /path</label><input id="cmsFavicon" data-content-path="site.faviconUrl" placeholder="/anna-mc-logo.svg"></div>
+   <div class="field"><label for="cmsThemeColor">Primary brand colour</label><input id="cmsThemeColor" type="color" data-content-path="site.themeColor" value="#f2ca50"></div>
+   <div class="field"><label for="cmsSupportEmail">Support email</label><input id="cmsSupportEmail" type="email" data-content-path="site.supportEmail" maxlength="254" placeholder="support@example.com"></div>
+  </div>
+  <label class="check-row"><input type="checkbox" data-content-path="site.maintenanceMode"> <span><strong>Maintenance notice mode</strong><small>Show a maintenance notice on public pages. This does not stop the website or game servers.</small></span></label>
+  <div class="divider"></div>
+  <h3>Homepage · Hero and join controls</h3>
+  <div class="grid">
+   <div class="field"><label>Top badge / version</label><input data-content-path="home.eyebrow" maxlength="120" placeholder="VERSION 1.21.x"></div>
+   <div class="field"><label>Performance badge</label><input data-content-path="home.performanceBadge" maxlength="120" placeholder="LAG-FREE"></div>
+   <div class="field"><label>Hero heading · first line</label><input data-content-path="home.titleLine1" maxlength="120"></div>
+   <div class="field"><label>Hero heading · second line</label><input data-content-path="home.titleLine2" maxlength="120"></div>
+   <div class="field"><label>Join button label</label><input data-content-path="home.joinButtonLabel" maxlength="120" placeholder="JOIN SERVER"></div>
+   <div class="field"><label>Homepage server address (copy button)</label><input data-content-path="home.serverAddress" maxlength="160" placeholder="play.example.net:25565"></div>
+  </div>
+  <div class="field"><label>Hero description</label><textarea rows="3" data-content-path="home.description" maxlength="500"></textarea></div>
+  <h3>Homepage · Live sections</h3>
+  <div class="grid">
+   <label class="check-row"><input type="checkbox" data-content-path="home.showLiveStatus"><span><strong>Show network player count</strong><small>Live proxy status card.</small></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="home.showModeStatus"><span><strong>Show game-mode status</strong><small>LifeSteal and Practice status cards.</small></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="home.showMetrics"><span><strong>Show performance metrics</strong><small>Homepage metrics strip.</small></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="home.showHighlights"><span><strong>Show editable highlights</strong><small>Feature cards controlled below.</small></span></label>
+  </div>
+  <div class="field"><label>Highlights section heading</label><input data-content-path="home.highlightsTitle" maxlength="120"></div>
+  <div class="field"><label>Highlights section description</label><textarea rows="2" data-content-path="home.highlightsSubtitle" maxlength="500"></textarea></div>
+  <div class="field"><label for="cmsHighlights">Homepage highlight cards · JSON</label><textarea id="cmsHighlights" class="code" rows="8" spellcheck="false"></textarea><p class="note">Up to 8 cards. Each item: {"id":"custom-pvp","icon":"⚔","title":"Custom PvP","description":"Balanced fights and unique mechanics."}</p></div>
+  <div class="divider"></div>
+  <h3>Network · Java, Bedrock and live status</h3>
+  <div class="grid">
+   <div class="field"><label>Public proxy address</label><input data-content-path="network.proxyAddress" maxlength="160"></div>
+   <div class="field"><label>LifeSteal backend address</label><input data-content-path="network.lifestealAddress" maxlength="160"></div>
+   <div class="field"><label>Practice backend address</label><input data-content-path="network.practiceAddress" maxlength="160"></div>
+   <div class="field"><label>Java version label</label><input data-content-path="network.javaVersion" maxlength="32" placeholder="1.21.x"></div>
+  </div>
+  <label class="check-row"><input type="checkbox" data-content-path="network.bedrockEnabled"><span><strong>Enable Bedrock connection details</strong><small>Controls display-ready connection information; it does not configure Geyser on the server.</small></span></label>
+  <div class="grid">
+   <div class="field"><label>Bedrock address</label><input data-content-path="network.bedrockAddress" maxlength="160"></div>
+   <div class="field"><label>Bedrock port</label><input type="number" min="1" max="65535" data-content-path="network.bedrockPort"></div>
+  </div>
+  <div class="divider"></div>
+  <h3>Global announcement bar</h3>
+  <label class="check-row"><input type="checkbox" data-content-path="announcement.enabled"><span><strong>Show announcement on public pages</strong><small>Use for updates, events, maintenance and important notices.</small></span></label>
+  <div class="grid">
+   <div class="field"><label>Announcement text</label><input data-content-path="announcement.text" maxlength="240"></div>
+   <div class="field"><label>Link button label</label><input data-content-path="announcement.linkLabel" maxlength="60"></div>
+   <div class="field"><label>Link URL</label><input data-content-path="announcement.linkUrl" maxlength="500" placeholder="https://..."></div>
+  </div>
+  <div class="divider"></div>
+  <h3>Social links & navigation visibility</h3>
+  <div class="grid">
+   <div class="field"><label>Discord invite URL</label><input data-content-path="social.discord" maxlength="500" placeholder="https://discord.gg/..."></div>
+   <div class="field"><label>YouTube URL</label><input data-content-path="social.youtube" maxlength="500"></div>
+   <div class="field"><label>Instagram URL</label><input data-content-path="social.instagram" maxlength="500"></div>
+   <div class="field"><label>TikTok URL</label><input data-content-path="social.tiktok" maxlength="500"></div>
+   <div class="field"><label>X / Twitter URL</label><input data-content-path="social.x" maxlength="500"></div>
+  </div>
+  <div class="grid">
+   <label class="check-row"><input type="checkbox" data-content-path="navigation.store"><span><strong>Show Store navigation</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="navigation.features"><span><strong>Show Features navigation</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="navigation.forums"><span><strong>Show Forums navigation</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="navigation.wiki"><span><strong>Show Wiki navigation</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="navigation.vote"><span><strong>Show Vote navigation</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="navigation.staff"><span><strong>Show Staff navigation</strong></span></label>
+  </div>
+  <div class="divider"></div>
+  <h3>Footer & legal display</h3>
+  <div class="grid">
+   <div class="field"><label>Copyright line</label><input data-content-path="footer.copyright" maxlength="180"></div>
+   <div class="field"><label>Legal disclaimer</label><input data-content-path="footer.disclaimer" maxlength="180"></div>
+   <div class="field"><label>Footer contact email</label><input data-content-path="footer.contactEmail" maxlength="254"></div>
+  </div>
+  <div class="grid">
+   <label class="check-row"><input type="checkbox" data-content-path="footer.showPrivacy"><span><strong>Show Privacy Policy link</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="footer.showTerms"><span><strong>Show Terms link</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="footer.showContact"><span><strong>Show Contact link</strong></span></label>
+   <label class="check-row"><input type="checkbox" data-content-path="footer.showStaff"><span><strong>Show Staff link</strong></span></label>
+  </div>
+  <div class="divider"></div>
+  <h3>Search previews · SEO</h3>
+  <div class="grid">
+   <div class="field"><label>Default page title</label><input data-content-path="seo.title" maxlength="160"></div>
+   <div class="field"><label>Open Graph image URL</label><input data-content-path="seo.ogImage" maxlength="500"></div>
+  </div>
+  <div class="field"><label>Default meta description</label><textarea rows="2" data-content-path="seo.description" maxlength="320"></textarea></div>
+  <div class="field"><label>Search keywords</label><input data-content-path="seo.keywords" maxlength="500"></div>
+  <div class="field"><label for="cmsPageSeo">Individual page titles & descriptions · JSON</label><textarea id="cmsPageSeo" class="code" rows="9" spellcheck="false"></textarea><p class="note">Use this for home, store, features, forums, wiki, vote, staff and contact. This controls search metadata, not the legal meaning of policy pages.</p></div>
+  <div class="form-actions"><button class="button primary" type="button" id="saveWebsiteContent">Save all website changes</button><button class="button ghost" type="button" id="reloadWebsiteContentBottom">Discard unsaved changes / reload</button></div>
+ </form>
+</div>
+<div class="card">
+ <div class="card-head"><div><h2>Advanced page editor</h2><p class="muted">For page elements not yet covered by a visual field, edit text by CSS selector or hide a section. The renderer applies these rules on all public pages. Use careful selectors and preview after saving.</p></div></div>
+ <div class="field"><label for="siteConfigJson">Advanced configuration JSON</label><textarea id="siteConfigJson" class="code" rows="12" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea><p class="note">Example: {"theme":{"primary":"#e6c34f"},"textOverrides":{"h1":"New heading"},"hideSelectors":[".old-banner"]}. Overrides replace text content; do not use untrusted HTML.</p></div>
+ <div class="form-actions"><button class="button primary" id="saveSiteConfig" type="button">Save advanced page rules</button><button class="button ghost" id="formatSiteConfig" type="button">Format JSON</button></div>
+</div>
 </section>
 <section class="section owner-only" id="view-staff">
 <div class="card"><div class="card-head"><div><h2>Staff access</h2><p class="muted">Owner-only staff accounts. Store managers can manage products and announcements; support staff can add order notes.</p></div></div><form id="staffForm"><div class="grid"><div class="field"><label for="sEmail">Staff email</label><input id="sEmail" name="email" type="email" required maxlength="254" autocomplete="off"></div><div class="field"><label for="sPassword">Temporary password (12+ characters)</label><input id="sPassword" name="password" type="password" required minlength="12" maxlength="200" autocomplete="new-password"></div><div class="field"><label for="sRole">Access role</label><select id="sRole" name="role"><option value="support">Support</option><option value="store_manager">Store manager</option></select></div></div><div class="form-actions"><button class="button primary" type="submit">Create staff account</button></div></form><div id="staffTable" style="margin-top:20px"><div class="loading"><span class="spinner"></span>Loading staff…</div></div></div>
@@ -106,8 +205,8 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
 "use strict";
 (()=> {
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let csrf="",role="guest",email="",products=[],announcements=[],gamemodes=[],orders=[],staff=[],siteConfig={theme:{},textOverrides:{},hideSelectors:[]},currentView="overview",confirmResolve=null;
-const titles={overview:["Control centre","A clear view of your Anna MC website."],products:["Store products","Manage the public catalogue and rank listings."],orders:["Orders & support","Review order records and support notes."],announcements:["Announcements","Keep players informed with current server news."],gamemodes:["Game mode manager","Configure the public game mode directory."],voting:["Voting & links","Manage voting instructions and external links."],website:["Website & theme","Manage brand colors and supported text overrides."],staff:["Staff access","Manage staff accounts and their permissions."],audit:["Activity log","Review recent administrative actions."]};
+let csrf="",role="guest",email="",products=[],announcements=[],gamemodes=[],orders=[],staff=[],siteConfig={theme:{},textOverrides:{},hideSelectors:[]},websiteContent={},currentView="overview",confirmResolve=null;
+const titles={overview:["Control centre","A clear view of your Anna MC website."],products:["Store products","Manage the public catalogue and rank listings."],orders:["Orders & support","Review order records and support notes."],announcements:["Announcements","Keep players informed with current server news."],gamemodes:["Game mode manager","Configure the public game mode directory."],voting:["Voting & links","Manage voting instructions and external links."],website:["Website CMS","Manage your public pages, branding, server details, announcements, links and search previews."],staff:["Staff access","Manage staff accounts and their permissions."],audit:["Activity log","Review recent administrative actions."]};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money=paise=>"₹"+(Number(paise||0)/100).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
 function toast(text,type="success"){const message=String(text||"Operation completed.");const el=document.createElement("div");el.className="toast "+type;el.setAttribute("role","status");el.textContent=message;$("#toastStack").appendChild(el);if(type==="error")showStatus(message,"error");setTimeout(()=>el.remove(),8000)}
@@ -125,7 +224,7 @@ $$("[data-view]").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.vi
 async function loadHealth(){try{const d=await api("/api/admin/health");const missing=(d.tables||[]).filter(t=>!t.exists).map(t=>t.name);const env=d.environment||{};const envIssues=[];if(!env.databaseUrlConfigured)envIssues.push("DATABASE_URL missing");if(!env.sessionSecretConfigured)envIssues.push("ANNA_SESSION_SECRET missing/too short");if(!env.adminPasswordConfigured)envIssues.push("ANNA_ADMIN_PASSWORD missing");let message=d.database?(missing.length?"Database connected, but missing tables: "+missing.join(", "):"Database connected · all "+(d.tables||[]).length+" required tables are present."):(d.error||"Database connection failed.");if(envIssues.length)message+=" Deployment settings: "+envIssues.join(", ")+". ";$("#healthSummary").textContent=message;$("#healthSummary").parentElement.classList.toggle("error",!d.database||missing.length>0||envIssues.length>0);return d}catch(e){$("#healthSummary").textContent=e.message;return null}}
 $("#runDiagnostics").addEventListener("click",async e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Checking…";try{const d=await loadHealth();if(d?.database&&(d.tables||[]).every(t=>t.exists)&&d.environment?.databaseUrlConfigured&&d.environment?.sessionSecretConfigured&&d.environment?.adminPasswordConfigured)toast("Database, schema and required environment settings are available.");else toast($("#healthSummary").textContent,"error")}catch(err){toast(err.message,"error")}finally{b.disabled=false;b.textContent="Check system & database"}});
 $("#repairSchema").addEventListener("click",async e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Repairing…";showStatus("Checking database connection and repairing missing tables. Keep this page open…","info");try{const result=await api("/api/admin/repair-schema",{method:"POST",body:"{}"});await loadHealth();await Promise.allSettled([loadProducts(),loadAnnouncements(),loadOrders(),loadGamemodes(),loadVoting(),loadSiteConfig(),loadStaff(),loadAudit()]);showStatus(result.message||"Database schema repair completed.","success");toast("Database schema checked and repaired.","success")}catch(err){showStatus(err.message,"error");toast(err.message,"error")}finally{b.disabled=false;b.textContent="Repair missing database tables"}});
-async function init(){try{const me=await api("/api/auth/me");if(!me.authenticated||!me.email)throw new Error("Please sign in to continue.");csrf=me.csrf||"";role=me.role||"guest";email=me.email;$("#userRole").textContent=role==="owner"?"Owner access":role==="store_manager"?"Store manager":"Support access";$("#userEmail").textContent=email;$$(".owner-only").forEach(el=>el.classList.toggle("hidden",role!=="owner"));if(role!=="owner"){$$('[data-view="overview"],[data-view="products"],[data-view="orders"],[data-view="announcements"]').forEach(()=>{});$("#view-overview .stat:nth-child(2)").classList.add("hidden")}await loadHealth();await Promise.allSettled([loadProducts(),loadAnnouncements(),loadOrders(),role==="owner"?loadGamemodes():Promise.resolve(),role==="owner"?loadAudit():Promise.resolve()]);await loadOverview()}catch(e){const next="/home?login=1&next="+encodeURIComponent("/admin");document.querySelector(".shell").innerHTML='<main style="max-width:620px;margin:12vh auto;padding:28px"><div class="eyebrow">Anna MC / Secure access</div><h1>Sign in to continue</h1><p class="muted" id="authError"></p><a class="button primary" style="display:inline-block;text-decoration:none" href="'+next+'">Sign in on Anna MC</a> <button class="button ghost" id="retryAuth">Try again</button></main>';$("#authError").textContent=e.message;$("#retryAuth").addEventListener("click",()=>location.reload())}}
+async function init(){try{const me=await api("/api/auth/me");if(!me.authenticated||!me.email)throw new Error("Please sign in to continue.");csrf=me.csrf||"";role=me.role||"guest";email=me.email;$("#userRole").textContent=role==="owner"?"Owner access":role==="store_manager"?"Store manager":"Support access";$("#userEmail").textContent=email;$$(".owner-only").forEach(el=>el.classList.toggle("hidden",role!=="owner"));if(role!=="owner"){$$('[data-view="overview"],[data-view="products"],[data-view="orders"],[data-view="announcements"]').forEach(()=>{});$("#view-overview .stat:nth-child(2)").classList.add("hidden")}await loadHealth();await Promise.allSettled([loadProducts(),loadAnnouncements(),loadOrders(),role==="owner"?loadGamemodes():Promise.resolve(),role==="owner"?loadAudit():Promise.resolve(),role==="owner"?loadSiteConfig():Promise.resolve(),role==="owner"?loadWebsiteContent():Promise.resolve()]);await loadOverview()}catch(e){const next="/home?login=1&next="+encodeURIComponent("/admin");document.querySelector(".shell").innerHTML='<main style="max-width:620px;margin:12vh auto;padding:28px"><div class="eyebrow">Anna MC / Secure access</div><h1>Sign in to continue</h1><p class="muted" id="authError"></p><a class="button primary" style="display:inline-block;text-decoration:none" href="'+next+'">Sign in on Anna MC</a> <button class="button ghost" id="retryAuth">Try again</button></main>';$("#authError").textContent=e.message;$("#retryAuth").addEventListener("click",()=>location.reload())}}
 $("#logout").addEventListener("click",async()=>{const ok=await askConfirm("Sign out?","Your admin session will end on this device.","Sign out");if(!ok)return;try{await api("/api/auth/logout",{method:"POST",body:"{}"})}catch{}csrf="";location.href="/"});
 async function loadProducts(){try{products=(await api("/api/admin/products")).products||[];renderProducts();return true}catch(e){$("#productsTable").innerHTML='<div class="empty"><strong>Products could not be loaded</strong>'+esc(e.message)+'</div>';toast(e.message,"error");return false}}
 function renderProducts(){const q=$("#productSearch").value.trim().toLowerCase(),list=products.filter(p=>[p.id,p.name,p.description,p.rank_group,p.target_server].some(v=>String(v||"").toLowerCase().includes(q)));$("#productsCount").textContent=list.length+" shown · "+products.length+" total";$("#statProducts").textContent=products.filter(p=>p.active).length;$("#statProductsSub").textContent=products.length+" saved records";$("#productsTable").innerHTML=table(["Product","Price","Target","Rank group","Visibility","Actions"],list.map(p=>['<div class="row-title">'+esc(p.name)+'</div><div class="row-sub">'+esc(p.id)+'</div><div class="row-sub">'+esc(p.description)+'</div>',money(p.price_paise),esc(p.target_server),'<span class="pill">'+esc(p.rank_group)+'</span>',statePill(p.active),'<div class="actions"><button class="button small" data-product-edit="'+esc(p.id)+'">Edit</button><button class="button small ghost" data-product-toggle="'+esc(p.id)+'">'+(p.active?"Hide":"Publish")+'</button><button class="button small danger" data-product-archive="'+esc(p.id)+'">Archive</button></div>']),"No products found",q?"Try another search.":"Add your first store product to populate the catalogue.");$("#productsTable").querySelectorAll("[data-product-edit]").forEach(b=>b.onclick=()=>editProduct(products.find(p=>p.id===b.dataset.productEdit)));$("#productsTable").querySelectorAll("[data-product-toggle]").forEach(b=>b.onclick=()=>toggleProduct(products.find(p=>p.id===b.dataset.productToggle)));$("#productsTable").querySelectorAll("[data-product-archive]").forEach(b=>b.onclick=()=>archiveProduct(products.find(p=>p.id===b.dataset.productArchive)))}
@@ -163,6 +262,43 @@ function themeFromInputs(){return {primary:$("#themePrimary").value,secondary:$(
 $("#reloadSiteConfig").addEventListener("click",loadSiteConfig);$("#saveTheme").addEventListener("click",async()=>{const config={...siteConfig,theme:{...(siteConfig.theme||{}),...themeFromInputs()}};try{const d=await api("/api/admin/site-config",{method:"PUT",body:JSON.stringify({config})});siteConfig=d.config;$("#siteConfigJson").value=JSON.stringify(siteConfig,null,2);toast("Theme colors saved. Refresh the public pages to see supported tokens update.")}catch(e){toast(e.message,"error")}});
 $("#formatSiteConfig").addEventListener("click",()=>{try{$("#siteConfigJson").value=JSON.stringify(JSON.parse($("#siteConfigJson").value),null,2);toast("JSON formatted.")}catch{toast("This is not valid JSON yet.","error")}});
 $("#saveSiteConfig").addEventListener("click",async()=>{try{let config;try{config=JSON.parse($("#siteConfigJson").value)}catch{throw new Error("Fix the JSON syntax before saving.")}if(!config||typeof config!=="object"||Array.isArray(config))throw new Error("Configuration must be a JSON object.");const d=await api("/api/admin/site-config",{method:"PUT",body:JSON.stringify({config})});siteConfig=d.config;$("#siteConfigJson").value=JSON.stringify(siteConfig,null,2);for(const [k,id] of [["primary","themePrimary"],["secondary","themeSecondary"],["tertiary","themeTertiary"],["background","themeBackground"],["surface","themeSurface"]])if(/^#[0-9a-f]{6}$/i.test(siteConfig.theme?.[k]||""))$("#"+id).value=siteConfig.theme[k];toast("Website configuration saved.")}catch(e){toast(e.message,"error")}});
+
+function cmsGet(obj,path){return path.split(".").reduce((v,k)=>v&&v[k]!==undefined?v[k]:undefined,obj)}
+function cmsSet(obj,path,value){const parts=path.split(".");let node=obj;for(const key of parts.slice(0,-1)){if(!node[key]||typeof node[key]!=="object")node[key]={};node=node[key]}node[parts[parts.length-1]]=value}
+async function loadWebsiteContent(){
+ try{
+  const d=await api("/api/admin/content");websiteContent=d.content||{};
+  $("[data-content-path]").forEach(el=>{const value=cmsGet(websiteContent,el.dataset.contentPath);if(el.type==="checkbox")el.checked=value===true;else el.value=value??""});
+  $("#cmsHighlights").value=JSON.stringify(websiteContent.home?.highlights||[],null,2);
+  $("#cmsPageSeo").value=JSON.stringify(websiteContent.pages||{},null,2);
+  $("#cmsSaveStatus").textContent="Content loaded"+(d.updatedAt?" · Last saved "+new Date(d.updatedAt).toLocaleString():" · Using default content until your first save.")+".";
+  $("#cmsSaveStatus").className="notice info";return true;
+ }catch(e){$("#cmsSaveStatus").textContent=e.message;$("#cmsSaveStatus").className="notice error";return false}
+}
+function collectWebsiteContent(){
+ const content=JSON.parse(JSON.stringify(websiteContent||{}));
+ $("[data-content-path]").forEach(el=>{let value;if(el.type==="checkbox")value=el.checked;else if(el.dataset.contentPath==="network.bedrockPort")value=el.value===""?19132:Number(el.value);else value=el.value.trim();cmsSet(content,el.dataset.contentPath,value)});
+ try{content.home=content.home||{};content.home.highlights=JSON.parse($("#cmsHighlights").value||"[]")}catch{throw new Error("Homepage highlights must be valid JSON before saving.")}
+ try{content.pages=JSON.parse($("#cmsPageSeo").value||"{}")}catch{throw new Error("Page SEO must be valid JSON before saving.")}
+ return content;
+}
+async function saveWebsiteContent(){
+ const button=$("#saveWebsiteContent");button.disabled=true;button.textContent="Saving…";
+ try{
+  const content=collectWebsiteContent();
+  const d=await api("/api/admin/content",{method:"PUT",body:JSON.stringify({content})});
+  websiteContent=d.content||content;
+  $("#cmsSaveStatus").textContent="Saved successfully · "+new Date(d.updatedAt||Date.now()).toLocaleString()+". Refresh the public website to see the changes.";
+  $("#cmsSaveStatus").className="notice success";
+  toast("Website content saved. Public pages now use the updated content.");
+ }catch(e){$("#cmsSaveStatus").textContent=e.message;$("#cmsSaveStatus").className="notice error";toast(e.message,"error")}
+ finally{button.disabled=false;button.textContent="Save all website changes"}
+}
+$("#saveWebsiteContent").addEventListener("click",saveWebsiteContent);
+$("#reloadWebsiteContent").addEventListener("click",loadWebsiteContent);
+$("#reloadWebsiteContentBottom").addEventListener("click",async()=>{const ok=await askConfirm("Discard unsaved website edits?","Unsaved values in this editor will be replaced with the last saved version.","Discard edits");if(ok)await loadWebsiteContent()});
+$("#previewWebsiteContent").addEventListener("click",()=>window.open("/","_blank","noopener"));
+
 async function loadStaff(){try{staff=(await api("/api/admin/staff")).staff||[];$("#staffTable").innerHTML=table(["Staff member","Role","Status","Actions"],staff.map(s=>[esc(s.email),esc(s.role.replaceAll("_"," ")),statePill(s.active),'<div class="actions"><button class="button small ghost" data-staff-toggle="'+esc(s.email)+'">'+(s.active?"Deactivate":"Reactivate")+'</button><button class="button small" data-staff-role="'+esc(s.email)+'">Change role</button></div>']),"No staff accounts","Create limited-access staff accounts above.");$("#staffTable").querySelectorAll("[data-staff-toggle]").forEach(b=>b.onclick=()=>changeStaffActive(staff.find(s=>s.email===b.dataset.staffToggle)));$("#staffTable").querySelectorAll("[data-staff-role]").forEach(b=>b.onclick=()=>changeStaffRole(staff.find(s=>s.email===b.dataset.staffRole)));return true}catch(e){$("#staffTable").innerHTML='<div class="empty"><strong>Staff records unavailable</strong>'+esc(e.message)+'</div>';toast(e.message,"error");return false}}
 $("#staffForm").addEventListener("submit",async e=>{e.preventDefault();const f=e.currentTarget,b=f.querySelector('[type="submit"]');b.disabled=true;try{const p={email:f.elements.email.value.trim(),password:f.elements.password.value,role:f.elements.role.value};await api("/api/admin/staff",{method:"POST",body:JSON.stringify(p)});f.reset();if(await loadStaff())toast("Staff account created.")}catch(err){toast(err.message,"error")}finally{b.disabled=false}});
 async function changeStaffActive(s){const active=!s.active;if(!await askConfirm((active?"Reactivate ":"Deactivate ")+s.email+"?",active?"This account will be allowed to access its assigned admin tools.":"This account will no longer be authorized to use admin tools.",active?"Reactivate":"Deactivate"))return;try{await api("/api/admin/staff",{method:"PATCH",body:JSON.stringify({email:s.email,active})});if(await loadStaff())toast("Staff access updated.")}catch(e){toast(e.message,"error")}}
@@ -171,7 +307,7 @@ async function loadOrders(){try{orders=(await api("/api/admin/orders?limit=100")
 function renderOrders(){const rows=orders.map(o=>['<div class="row-title">'+esc(o.minecraft_username)+'</div><div class="row-sub code">'+esc(o.id)+'</div><div class="row-sub">'+esc(new Date(o.created_at).toLocaleString())+'</div>',esc(o.target_server),money(o.amount_paise),statusPill(o.status),statusPill(o.delivery_status),'<textarea class="control" data-note="'+esc(o.id)+'" rows="2" maxlength="2000" aria-label="Support note">'+esc(o.support_notes||"")+'</textarea><button class="button small" style="margin-top:6px" data-note-save="'+esc(o.id)+'">Save note</button>']);$("#ordersTable").innerHTML=table(["Player / order","Server","Amount","Payment","Delivery","Support notes"],rows,"No orders yet","Orders appear here after checkout/order creation is connected.");$("#statOrders").textContent=orders.length;$("#statOrdersSub").textContent=orders.filter(o=>o.status==="pending").length+" pending · "+orders.filter(o=>o.status==="paid").length+" paid";$("#ordersTable").querySelectorAll("[data-note-save]").forEach(b=>b.onclick=async()=>{const id=b.dataset.noteSave,note=$("#ordersTable").querySelector('[data-note="'+id+'"]').value;b.disabled=true;try{await api("/api/admin/orders",{method:"PATCH",body:JSON.stringify({id,support_notes:note})});toast("Support note saved.")}catch(e){toast(e.message,"error")}finally{b.disabled=false}})}
 async function loadAudit(){try{const d=await api("/api/admin/audit?limit=50"),rows=(d.logs||[]).map(x=>['<div class="row-title">'+esc(x.action)+'</div><div class="row-sub">'+esc(x.entity_type||"")+' '+esc(x.entity_id||"")+'</div>',esc(x.actor_email),esc(new Date(x.created_at).toLocaleString()),'<span class="code">'+esc(JSON.stringify(x.details||{}))+'</span>']);$("#auditTable").innerHTML=table(["Action / entity","Actor","When","Details"],rows,"No activity yet","Administrative actions will appear here after successful saves.");$("#recentActivity").innerHTML=table(["Action","Actor","When"],(d.logs||[]).slice(0,5).map(x=>[esc(x.action),esc(x.actor_email),esc(new Date(x.created_at).toLocaleString())]),"No recent activity","Changes will appear here.");return true}catch(e){$("#auditTable").innerHTML='<div class="empty"><strong>Activity log unavailable</strong>'+esc(e.message)+'</div>';$("#recentActivity").textContent=e.message;return false}}
 async function loadOverview(){const tasks=[loadProducts(),loadAnnouncements(),loadOrders()];if(role==="owner")tasks.push(loadGamemodes(),loadAudit());await Promise.allSettled(tasks)}
-async function refreshView(view,manual=false){let ok=true;switch(view){case"overview":await loadOverview();await loadHealth();break;case"products":ok=await loadProducts();break;case"orders":ok=await loadOrders();break;case"announcements":ok=await loadAnnouncements();break;case"gamemodes":ok=await loadGamemodes();break;case"voting":ok=await loadVoting();break;case"website":ok=await loadSiteConfig();break;case"staff":ok=await loadStaff();break;case"audit":ok=await loadAudit();break}if(manual&&ok)toast("Section refreshed.")}
+async function refreshView(view,manual=false){let ok=true;switch(view){case"overview":await loadOverview();await loadHealth();break;case"products":ok=await loadProducts();break;case"orders":ok=await loadOrders();break;case"announcements":ok=await loadAnnouncements();break;case"gamemodes":ok=await loadGamemodes();break;case"voting":ok=await loadVoting();break;case"website":{const results=await Promise.all([loadSiteConfig(),loadWebsiteContent()]);ok=results.every(Boolean);break;}case"staff":ok=await loadStaff();break;case"audit":ok=await loadAudit();break}if(manual&&ok)toast("Section refreshed.")}
 init();
 })();
 </script></body></html>
