@@ -74,8 +74,9 @@ module.exports = async function handler(req, res) {
         ? { online: proxy.online, playersOnline: proxy.playersOnline, maxPlayers: proxy.maxPlayers }
         : { online: false, playersOnline: 0, maxPlayers: 0 },
       proxy,
-      proxyAddress: TARGETS.proxy,
+      proxyAddress: targets.proxy,
       servers,
+      serverAddresses: { lifesteal: targets.lifesteal, practice: targets.practice },
       availability: { proxy: proxyAvailable, lifesteal: lifeAvailable, practice: practiceAvailable },
       source: "mcstatus.io"
     });
