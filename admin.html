@@ -281,6 +281,19 @@ function collectWebsiteContent(){
  try{content.home=content.home||{};content.home.highlights=JSON.parse($("#cmsHighlights").value||"[]")}catch{throw new Error("Homepage highlights must be valid JSON before saving.")}
  try{content.pages=JSON.parse($("#cmsPageSeo").value||"{}")}catch{throw new Error("Page SEO must be valid JSON before saving.")}
  try{content.pageSections=JSON.parse($("#cmsPageSections").value||"{}")}catch{throw new Error("Custom page sections must be valid JSON before saving.")}
+ const validPublicUrl=value=>!value||(/^\/(?!\/)/.test(value)||/^https:\/\//i.test(value));
+ for(const [label,value] of [["Logo URL",content.site.logoUrl],["Favicon URL",content.site.faviconUrl],["Announcement URL",content.announcement.linkUrl],["Social link",Object.values(content.social).find(v=>v&&!/^https:\/\//i.test(v))],["SEO image URL",content.seo.ogImage]]){
+  if(value&&!validPublicUrl(value))throw new Error(label+" must be an HTTPS URL or a site-relative path starting with /.");
+ }
+ if(content.site.supportEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(content.site.supportEmail))throw new Error("Enter a valid support email address.");
+ if(content.footer.contactEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(content.footer.contactEmail))throw new Error("Enter a valid footer contact email address.");
+ for(const [label,value] of [["Homepage join address",content.home.serverAddress],["Proxy address",content.network.proxyAddress],["LifeSteal address",content.network.lifestealAddress],["Practice address",content.network.practiceAddress]]){
+  if(value&&!/^[a-zA-Z0-9.-]+(?::[0-9]{1,5})?$/.test(value))throw new Error(label+" must be a hostname or IP, optionally followed by :port.");
+ }
+ if(content.network.bedrockAddress&&!/^[a-zA-Z0-9.-]+(?::[0-9]{1,5})?$/.test(content.network.bedrockAddress))throw new Error("Bedrock address must be a hostname or IP, optionally followed by :port.");
+ for(const page of Object.values(content.pageSections||{}))for(const block of (Array.isArray(page)?page:[])){
+  for(const [label,value] of [["Section image",block.imageUrl],["Section button URL",block.buttonUrl]])if(value&&!validPublicUrl(value))throw new Error(label+" must be an HTTPS URL or a site-relative path starting with /.");
+ }
  return content;
 }
 async function saveWebsiteContent(){
