@@ -27,7 +27,8 @@
     const page=(location.pathname.split("/").pop()||"index.html").replace(".html","")||"home";
     const pageKey=page==="index"?"home":page;
     const pageSeo=content.pages?.[pageKey]||{};
-    const title=pageSeo.title||content.seo?.title,description=pageSeo.description||content.seo?.description;
+    const brandName=content.site?.name||"Anna MC";
+    const title=(pageSeo.title||content.seo?.title||brandName).replace(/Anna MC/g,brandName),description=(pageSeo.description||content.seo?.description||content.site?.tagline||"");
     if(title){
       document.title=title;
       for(const selector of ['meta[property="og:title"]','meta[name="twitter:title"]']){const m=document.querySelector(selector);if(m)m.content=title;}
@@ -105,8 +106,26 @@
       const style=document.createElement("style");style.textContent=".anna-cms-page-sections{max-width:1100px;margin:32px auto 60px;padding:0 20px;display:grid;gap:18px}.anna-cms-page-block{padding:clamp(20px,4vw,34px);border:1px solid rgba(242,202,80,.18);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.018));color:#eee}.anna-cms-page-eyebrow{color:#f2ca50;font:700 11px Inter,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase}.anna-cms-page-block h2{font:800 clamp(21px,3vw,30px)/1.2 'Space Grotesk',sans-serif;margin:8px 0 12px}.anna-cms-page-block>p:not(.anna-cms-page-eyebrow){color:#b4b4b4;font:400 15px/1.7 Inter,system-ui,sans-serif;white-space:pre-line;max-width:850px}.anna-cms-page-block img{display:block;width:100%;max-height:380px;object-fit:cover;border-radius:14px;margin-top:16px}.anna-cms-page-block a{display:inline-flex;margin-top:15px;padding:10px 16px;border-radius:10px;background:#f2ca50;color:#171719;font:700 12px Inter,system-ui,sans-serif;text-decoration:none}";
       document.head.appendChild(style);
     }
+    if(pageKey==="home"&&content.network?.bedrockEnabled&&content.network?.bedrockAddress){
+      const main=document.querySelector("main");
+      if(main&&!document.getElementById("anna-cms-edition-info")){
+        const section=document.createElement("section");section.id="anna-cms-edition-info";section.className="anna-cms-edition-info";
+        const heading=document.createElement("h2");heading.textContent="CONNECT TO ANNA MC";
+        const java=document.createElement("div");java.className="anna-cms-edition-item";
+        const javaTitle=document.createElement("strong");javaTitle.textContent="Java Edition";
+        const javaBody=document.createElement("span");javaBody.textContent=(content.home?.serverAddress||content.network.proxyAddress||"")+" · "+(content.network.javaVersion||"1.21.x");
+        java.append(javaTitle,javaBody);
+        const bedrock=document.createElement("div");bedrock.className="anna-cms-edition-item";
+        const bedrockTitle=document.createElement("strong");bedrockTitle.textContent="Bedrock Edition";
+        const bedrockBody=document.createElement("span");bedrockBody.textContent=content.network.bedrockAddress+" · Port "+content.network.bedrockPort;
+        bedrock.append(bedrockTitle,bedrockBody);
+        section.append(heading,java,bedrock);main.appendChild(section);
+        const style=document.createElement("style");style.textContent=".anna-cms-edition-info{max-width:900px;margin:30px auto 50px;padding:24px;border:1px solid rgba(242,202,80,.2);border-radius:18px;background:#101012;color:#f5f5f5}.anna-cms-edition-info h2{font:800 17px 'Space Grotesk',sans-serif;color:#f2ca50;letter-spacing:.12em;margin:0 0 16px}.anna-cms-edition-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px 0;border-top:1px solid #ffffff18;font:13px Inter,system-ui,sans-serif}.anna-cms-edition-item span{color:#aaa;overflow-wrap:anywhere}";
+        document.head.appendChild(style);
+      }
+    }
     const socials=content.social||{},socialLinks=Object.entries(socials).filter(([,url])=>safeUrl(url));
-    if(footerNode&&socialLinks.length&&!footerNode.querySelector(".anna-cms-socials")){
+    if(footerNode&&content.footer?.contactEmail&&/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(content.footer.contactEmail)&&!footerNode.querySelector(".anna-cms-contact-email")){const contact=document.createElement("a");contact.className="anna-cms-contact-email";contact.href="mailto:"+content.footer.contactEmail;contact.textContent=content.footer.contactEmail;footerNode.appendChild(contact);const style=document.createElement("style");style.textContent=".anna-cms-contact-email{display:block;text-align:center;padding:0 16px 18px;color:#aaa;font:12px Inter,system-ui,sans-serif;text-decoration:none}";document.head.appendChild(style);}\n    if(footerNode&&socialLinks.length&&!footerNode.querySelector(".anna-cms-socials")){
       const row=document.createElement("div");row.className="anna-cms-socials";
       for(const [name,url] of socialLinks){const a=document.createElement("a");a.href=safeUrl(url);a.target="_blank";a.rel="noopener noreferrer";a.textContent=name==="x"?"X":name.charAt(0).toUpperCase()+name.slice(1);row.appendChild(a);}
       footerNode.appendChild(row);const style=document.createElement("style");style.textContent=".anna-cms-socials{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:0 18px 22px}.anna-cms-socials a{color:#aaa;font:700 11px Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;text-decoration:none}.anna-cms-socials a:hover{color:#f2ca50}";document.head.appendChild(style);
