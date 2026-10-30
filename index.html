@@ -396,8 +396,7 @@
         <section class="flex flex-col items-center text-center mb-stack-lg min-h-[70vh] justify-center relative">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 flex gap-4 opacity-50">
                 <span
-                    class="px-3 py-1 border border-primary/30 rounded-full text-[10px] font-tech text-primary tracking-[0.2em] whitespace-nowrap">VERSION
-                    1.20.4</span>
+                    class="px-3 py-1 border border-primary/30 rounded-full text-[10px] font-tech text-primary tracking-[0.2em] whitespace-nowrap">VERSION 1.21.x</span>
                 <span
                     class="px-3 py-1 border border-tertiary/30 rounded-full text-[10px] font-tech text-tertiary tracking-[0.2em] whitespace-nowrap">LAG-FREE</span>
             </div>
@@ -409,7 +408,7 @@
             </div>
 
             <div class="space-y-4 mb-8 w-full">
-                <h1 class="minecraft-heading text-4xl sm:text-5xl md:text-8xl text-white tracking-tighter leading-none">
+                <h1 class="minecraft-heading text-4xl sm:text-5xl md:text-8xl text-white tracking-tighter leading-none" data-cms="home.titleLine1">
                     ASCEND TO
                 </h1>
                 <div class="flex items-center justify-center gap-2 md:gap-4 w-full">
@@ -417,28 +416,23 @@
                         class="h-[2px] flex-1 max-w-[3rem] md:max-w-[6rem] bg-gradient-to-r from-transparent to-primary">
                     </div>
                     <span
-                        class="pixel-text text-xl sm:text-2xl md:text-5xl text-primary drop-shadow-[0_0_15px_rgba(242,202,80,0.6)]">ETERNITY</span>
+                        class="pixel-text text-xl sm:text-2xl md:text-5xl text-primary drop-shadow-[0_0_15px_rgba(242,202,80,0.6)]" data-cms="home.titleLine2">ETERNITY</span>
                     <div
                         class="h-[2px] flex-1 max-w-[3rem] md:max-w-[6rem] bg-gradient-to-l from-transparent to-primary">
                     </div>
                 </div>
             </div>
 
-            <p class="max-w-xl text-zinc-400 mb-10 font-tech text-base md:text-lg leading-relaxed px-4">
-                The ultimate <span class="text-white">Full-Stack</span> survival experience.
-                Where custom mechanics meet a community of legends.
-            </p>
+            <p class="max-w-xl text-zinc-400 mb-10 font-tech text-base md:text-lg leading-relaxed px-4" data-cms="home.description">The ultimate Minecraft survival experience. Where custom mechanics meet a community of legends.</p>
 
             <div
                 class="flex flex-col justify-center md:flex-row items-stretch gap-0 rounded-2xl overflow-hidden border border-white/10 shadow-2xl w-full max-w-md">
-                <button onclick="copyToClipboard('play.annamc.bond')"
+                <button data-cms-copy-server="true"
                     class="button-shine bg-primary text-on-primary px-8 md:px-10 py-4 md:py-5 font-tech font-black text-base md:text-lg flex items-center justify-center gap-3 active:scale-95 transition-transform w-full md:flex-1">
-                    <span class="material-symbols-outlined">play_arrow</span>
-                    JOIN SERVER
-                </button>
+                    <span class="material-symbols-outlined">play_arrow</span><span data-cms="home.joinButtonLabel">JOIN SERVER</span></button>
                 <div
                     class="bg-zinc-950/80 backdrop-blur-md px-6 md:px-8 py-4 md:py-5 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 text-center md:text-left">
-                    <p class="text-[10px] text-zinc-500 font-bold tracking-[0.3em] uppercase">IP: sg-4.madflex.shop:19139</p>
+                    <p class="text-[10px] text-zinc-500 font-bold tracking-[0.3em] uppercase">IP: <span data-cms-server-address>sg-4.madflex.shop:19139</span></p>
                     <div class="flex items-center justify-center md:justify-start gap-2 mt-1 md:mt-0">
                         <div class="w-2 h-2 bg-secondary rounded-full animate-ping"></div>
                         <p id="network-player-count" class="text-secondary text-sm font-minecraft">Checking live status…</p>
@@ -447,7 +441,7 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mb-stack-lg" aria-label="Game mode status">
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mb-stack-lg" aria-label="Game mode status" data-cms-show="home.showModeStatus">
             <div class="glass-panel p-5 rounded-2xl flex items-center justify-between gap-3"><div><p class="text-xs uppercase tracking-widest text-zinc-500 font-bold">LifeSteal</p><p id="lifesteal-status" class="text-lg text-zinc-200 font-bold">Checking…</p></div><p id="lifesteal-players" class="text-sm text-zinc-400">— players</p></div>
             <div class="glass-panel p-5 rounded-2xl flex items-center justify-between gap-3"><div><p class="text-xs uppercase tracking-widest text-zinc-500 font-bold">Practice</p><p id="practice-status" class="text-lg text-zinc-200 font-bold">Checking…</p></div><p id="practice-players" class="text-sm text-zinc-400">— players</p></div>
         </section>
@@ -913,8 +907,7 @@
                     <img loading="lazy" src="anna-mc-logo.svg"
                         class="h-8 md:h-10 object-contain grayscale relative z-10 transition-transform" alt="Anna MC logo" />
                 </div>
-                <p class="font-tech text-[10px] md:text-xs uppercase tracking-widest text-zinc-500">© 2026 Anna MC
-                    Network. Not an official Minecraft product.</p>
+                <p class="font-tech text-[10px] md:text-xs uppercase tracking-widest text-zinc-500"><span data-cms-footer-copyright>© 2026 Anna MC Network.</span></p>
             </div>
             <div class="flex flex-wrap justify-center gap-6 md:gap-8">
                 <a class="text-zinc-500 hover:text-yellow-500 transition-colors font-tech text-[10px] md:text-xs uppercase tracking-widest"
@@ -1126,6 +1119,7 @@
 <script>
 (async()=>{try{const response=await fetch("/api/site-config",{credentials:"same-origin",cache:"no-store"});if(!response.ok)return;const data=await response.json(),config=data.config||{};const theme=config.theme||{};for(const [key,value] of Object.entries(theme)){if(typeof value!=="string"||/[;{}<>]/.test(value))continue;if(/^--[a-zA-Z0-9_-]{1,60}$/.test(key))document.documentElement.style.setProperty(key,value);else if(["primary","secondary","tertiary","background","surface"].includes(key)){document.documentElement.style.setProperty("--admin-"+key,value);document.documentElement.style.setProperty("--"+key,value)}}let style=document.getElementById("admin-theme-overrides");if(!style){style=document.createElement("style");style.id="admin-theme-overrides";document.head.appendChild(style)}style.textContent=".text-primary{color:var(--admin-primary)!important}.bg-primary{background-color:var(--admin-primary)!important}.border-primary{border-color:var(--admin-primary)!important}.text-secondary{color:var(--admin-secondary)!important}.bg-secondary{background-color:var(--admin-secondary)!important}.border-secondary{border-color:var(--admin-secondary)!important}.text-tertiary{color:var(--admin-tertiary)!important}.bg-tertiary{background-color:var(--admin-tertiary)!important}.border-tertiary{border-color:var(--admin-tertiary)!important}";for(const [selector,value] of Object.entries(config.textOverrides||{})){if(typeof value!=="string")continue;try{document.querySelectorAll(selector).forEach(el=>{el.textContent=value})}catch{}}for(const selector of config.hideSelectors||[]){if(typeof selector!=="string")continue;try{document.querySelectorAll(selector).forEach(el=>{el.hidden=true;el.setAttribute("aria-hidden","true")})}catch{}}}catch(e){console.warn("Website overrides unavailable",e)}})();
 </script>
+<script src="/site-content.js" defer></script>
 </body>
 
 </html>
