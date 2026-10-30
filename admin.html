@@ -113,6 +113,9 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
    <div class="field"><label>Hero heading · second line</label><input data-content-path="home.titleLine2" maxlength="120"></div>
    <div class="field"><label>Join button label</label><input data-content-path="home.joinButtonLabel" maxlength="120" placeholder="JOIN SERVER"></div>
    <div class="field"><label>Homepage server address (copy button)</label><input data-content-path="home.serverAddress" maxlength="160" placeholder="play.example.net:25565"></div>
+   <div class="field"><label>Hero background image URL</label><input data-content-path="home.heroBackgroundUrl" maxlength="500" placeholder="/images/home-hero.webp"></div>
+   <div class="field"><label>Secondary button label</label><input data-content-path="home.secondaryCtaLabel" maxlength="60" placeholder="Explore features"></div>
+   <div class="field"><label>Secondary button link</label><input data-content-path="home.secondaryCtaUrl" maxlength="500" placeholder="/features.html"></div>
   </div>
   <div class="field"><label>Hero description</label><textarea rows="3" data-content-path="home.description" maxlength="500"></textarea></div>
   <h3>Homepage · Live sections</h3>
@@ -124,7 +127,15 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
   </div>
   <div class="field"><label>Highlights section heading</label><input data-content-path="home.highlightsTitle" maxlength="120"></div>
   <div class="field"><label>Highlights section description</label><textarea rows="2" data-content-path="home.highlightsSubtitle" maxlength="500"></textarea></div>
-  <div class="field"><label for="cmsHighlights">Homepage highlight cards · JSON</label><textarea id="cmsHighlights" class="code" rows="8" spellcheck="false"></textarea><p class="note">Up to 8 cards. Each item: {"id":"custom-pvp","icon":"⚔","title":"Custom PvP","description":"Balanced fights and unique mechanics."}</p></div>
+  <div class="field"><div class="toolbar"><div><label>Homepage highlight cards</label><p class="note">Add, edit, reorder or remove up to 8 feature cards without editing code.</p></div><button class="button small" type="button" id="cmsAddHighlight">＋ Add highlight</button></div><div id="cmsHighlightsEditor"></div></div>
+  <div class="divider"></div>
+  <h3>Homepage · Metric cards</h3>
+  <p class="note">Edit all three metric labels, values and captions. Keep figures factual and update them when they change.</p>
+  <div class="grid">
+   <div class="card"><strong>Metric 1</strong><div class="field"><label>Label</label><input data-content-path="home.metrics.0.label" maxlength="60"></div><div class="field"><label>Value</label><input data-content-path="home.metrics.0.value" maxlength="60"></div><div class="field"><label>Caption</label><input data-content-path="home.metrics.0.caption" maxlength="60"></div></div>
+   <div class="card"><strong>Metric 2</strong><div class="field"><label>Label</label><input data-content-path="home.metrics.1.label" maxlength="60"></div><div class="field"><label>Value</label><input data-content-path="home.metrics.1.value" maxlength="60"></div><div class="field"><label>Caption</label><input data-content-path="home.metrics.1.caption" maxlength="60"></div></div>
+   <div class="card"><strong>Metric 3</strong><div class="field"><label>Label</label><input data-content-path="home.metrics.2.label" maxlength="60"></div><div class="field"><label>Value</label><input data-content-path="home.metrics.2.value" maxlength="60"></div><div class="field"><label>Caption</label><input data-content-path="home.metrics.2.caption" maxlength="60"></div></div>
+  </div>
   <div class="divider"></div>
   <h3>Network · Java, Bedrock and live status</h3>
   <div class="grid">
@@ -163,6 +174,20 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
    <label class="check-row"><input type="checkbox" data-content-path="navigation.vote"><span><strong>Show Vote navigation</strong></span></label>
    <label class="check-row"><input type="checkbox" data-content-path="navigation.staff"><span><strong>Show Staff navigation</strong></span></label>
   </div>
+  <div class="grid">
+   <div class="field"><label>Store navigation label</label><input data-content-path="navigationLabels.store" maxlength="40"></div>
+   <div class="field"><label>Store page URL</label><input data-content-path="navigationUrls.store" maxlength="500"></div>
+   <div class="field"><label>Play / Features navigation label</label><input data-content-path="navigationLabels.features" maxlength="40"></div>
+   <div class="field"><label>Play / Features page URL</label><input data-content-path="navigationUrls.features" maxlength="500"></div>
+   <div class="field"><label>Forums navigation label</label><input data-content-path="navigationLabels.forums" maxlength="40"></div>
+   <div class="field"><label>Forums page URL</label><input data-content-path="navigationUrls.forums" maxlength="500"></div>
+   <div class="field"><label>Wiki navigation label</label><input data-content-path="navigationLabels.wiki" maxlength="40"></div>
+   <div class="field"><label>Wiki page URL</label><input data-content-path="navigationUrls.wiki" maxlength="500"></div>
+   <div class="field"><label>Vote navigation label</label><input data-content-path="navigationLabels.vote" maxlength="40"></div>
+   <div class="field"><label>Vote page URL</label><input data-content-path="navigationUrls.vote" maxlength="500"></div>
+   <div class="field"><label>Staff navigation label</label><input data-content-path="navigationLabels.staff" maxlength="40"></div>
+   <div class="field"><label>Staff page URL</label><input data-content-path="navigationUrls.staff" maxlength="500"></div>
+  </div>
   <div class="divider"></div>
   <h3>Footer & legal display</h3>
   <div class="grid">
@@ -184,8 +209,19 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
   </div>
   <div class="field"><label>Default meta description</label><textarea rows="2" data-content-path="seo.description" maxlength="320"></textarea></div>
   <div class="field"><label>Search keywords</label><input data-content-path="seo.keywords" maxlength="500"></div>
-  <div class="field"><label for="cmsPageSeo">Individual page titles & descriptions · JSON</label><textarea id="cmsPageSeo" class="code" rows="9" spellcheck="false"></textarea><p class="note">Controls search metadata for home, store, features, forums, wiki, vote, staff, contact, privacy and terms.</p></div>
-  <div class="field"><label for="cmsPageSections">Custom content sections for each page · JSON</label><textarea id="cmsPageSections" class="code" rows="12" spellcheck="false"></textarea><p class="note">Add up to 12 extra text/image/CTA sections per page without touching source files. Use plain text only. Example: {"home":[{"id":"season-1","eyebrow":"SEASON 01","title":"The new era","body":"A new chapter begins on Anna MC.","imageUrl":"/images/season.jpg","buttonLabel":"Explore","buttonUrl":"/features.html","active":true}],"features":[]}. Existing page sections can still be hidden through the advanced page editor.</p></div>
+  <div class="card">
+   <h3>Individual page content & SEO editor</h3>
+   <div class="field"><label for="cmsSeoPage">Choose page</label><select id="cmsSeoPage"><option value="home">Home</option><option value="store">Store</option><option value="features">Features</option><option value="forums">Forums</option><option value="forum-thread">Forum thread</option><option value="wiki">Wiki</option><option value="vote">Vote</option><option value="staff">Staff</option><option value="contact">Contact</option><option value="privacy">Privacy</option><option value="terms">Terms</option></select></div>
+   <div class="grid"><div class="field"><label>Search result / browser title</label><input id="cmsSeoTitle" maxlength="160"></div><div class="field"><label>Visible page heading</label><input id="cmsSeoHeading" maxlength="120"></div></div>
+   <div class="field"><label>Search description</label><textarea id="cmsSeoDescription" rows="2" maxlength="320"></textarea></div>
+   <div class="field"><label>Visible page introduction</label><textarea id="cmsSeoIntro" rows="3" maxlength="500"></textarea></div>
+   <div class="field"><label>Page hero image URL</label><input id="cmsSeoHeroImage" maxlength="500" placeholder="/images/page-hero.webp"></div>
+  </div>
+  <div class="card">
+   <div class="toolbar"><div><h3>Visual page builder</h3><p class="note">Choose a page, add content sections and arrange them with the arrow controls. Blocks support a label, heading, text, image and button.</p></div><div class="field"><label for="cmsSectionPage">Edit page</label><select id="cmsSectionPage"><option value="home">Home</option><option value="store">Store</option><option value="features">Features</option><option value="forums">Forums</option><option value="forum-thread">Forum thread</option><option value="wiki">Wiki</option><option value="vote">Vote</option><option value="staff">Staff</option><option value="contact">Contact</option><option value="privacy">Privacy</option><option value="terms">Terms</option></select></div></div>
+   <div id="cmsPageSectionsEditor"></div>
+   <div class="form-actions"><button class="button" type="button" id="cmsAddPageSection">＋ Add section to this page</button></div>
+  </div>
   <div class="form-actions"><button class="button primary" type="button" id="saveWebsiteContent">Save all website changes</button><button class="button ghost" type="button" id="reloadWebsiteContentBottom">Discard unsaved changes / reload</button></div>
  </form>
 </div>
@@ -207,7 +243,7 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
 "use strict";
 (()=> {
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let csrf="",role="guest",email="",products=[],announcements=[],gamemodes=[],orders=[],staff=[],siteConfig={theme:{},textOverrides:{},hideSelectors:[]},websiteContent={},currentView="overview",confirmResolve=null;
+let csrf="",role="guest",email="",products=[],announcements=[],gamemodes=[],orders=[],staff=[],siteConfig={theme:{},textOverrides:{},hideSelectors:[]},websiteContent={},cmsSeoPage="home",cmsSectionPage="home",currentView="overview",confirmResolve=null;
 const titles={overview:["Control centre","A clear view of your Anna MC website."],products:["Store products","Manage the public catalogue and rank listings."],orders:["Orders & support","Review order records and support notes."],announcements:["Announcements","Keep players informed with current server news."],gamemodes:["Game mode manager","Configure the public game mode directory."],voting:["Voting & links","Manage voting instructions and external links."],website:["Website CMS","Manage your public pages, branding, server details, announcements, links and search previews."],staff:["Staff access","Manage staff accounts and their permissions."],audit:["Activity log","Review recent administrative actions."]};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money=paise=>"₹"+(Number(paise||0)/100).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -264,13 +300,23 @@ $("#formatSiteConfig").addEventListener("click",()=>{try{$("#siteConfigJson").va
 $("#saveSiteConfig").addEventListener("click",async()=>{try{let config;try{config=JSON.parse($("#siteConfigJson").value)}catch{throw new Error("Fix the JSON syntax before saving.")}if(!config||typeof config!=="object"||Array.isArray(config))throw new Error("Configuration must be a JSON object.");const d=await api("/api/admin/site-config",{method:"PUT",body:JSON.stringify({config})});siteConfig=d.config;$("#siteConfigJson").value=JSON.stringify(siteConfig,null,2);toast("Advanced page rules saved.")}catch(e){toast(e.message,"error")}});
 function cmsGet(obj,path){return path.split(".").reduce((v,k)=>v&&v[k]!==undefined?v[k]:undefined,obj)}
 function cmsSet(obj,path,value){const parts=path.split(".");let node=obj;for(const key of parts.slice(0,-1)){if(!node[key]||typeof node[key]!=="object")node[key]={};node=node[key]}node[parts[parts.length-1]]=value}
+function cmsCurrentSeo(){websiteContent.pages=websiteContent.pages||{};websiteContent.pages[cmsSeoPage]=websiteContent.pages[cmsSeoPage]||{};const p=websiteContent.pages[cmsSeoPage];p.title=$("#cmsSeoTitle").value.trim();p.heading=$("#cmsSeoHeading").value.trim();p.description=$("#cmsSeoDescription").value.trim();p.intro=$("#cmsSeoIntro").value.trim();p.heroImageUrl=$("#cmsSeoHeroImage").value.trim()}
+function renderCmsSeo(){const p=websiteContent.pages?.[cmsSeoPage]||{};$("#cmsSeoTitle").value=p.title||"";$("#cmsSeoHeading").value=p.heading||"";$("#cmsSeoDescription").value=p.description||"";$("#cmsSeoIntro").value=p.intro||"";$("#cmsSeoHeroImage").value=p.heroImageUrl||""}
+function renderCmsHighlights(){
+ const items=websiteContent.home?.highlights||[];
+ $("#cmsHighlightsEditor").innerHTML=items.map((item,i)=>'<div class="card" style="margin:10px 0;padding:15px"><div class="toolbar"><strong>Highlight '+(i+1)+'</strong><div class="actions"><button class="button small ghost" type="button" data-highlight-move="'+i+'" data-dir="-1" '+(i===0?'disabled':'')+'>↑</button><button class="button small ghost" type="button" data-highlight-move="'+i+'" data-dir="1" '+(i===items.length-1?'disabled':'')+'>↓</button><button class="button small danger" type="button" data-highlight-remove="'+i+'">Remove</button></div></div><div class="grid"><div class="field"><label>Icon</label><input data-highlight-index="'+i+'" data-highlight-field="icon" maxlength="8" value="'+esc(item.icon)+'"></div><div class="field"><label>Card title</label><input data-highlight-index="'+i+'" data-highlight-field="title" maxlength="80" value="'+esc(item.title)+'"></div><div class="field full"><label>Description</label><textarea data-highlight-index="'+i+'" data-highlight-field="description" rows="2" maxlength="240">'+esc(item.description)+'</textarea></div></div></div>').join("")||'<div class="empty">No highlights yet. Add a card to show your server features.</div>';
+}
+function renderCmsPageSections(){
+ const items=websiteContent.pageSections?.[cmsSectionPage]||[];
+ $("#cmsPageSectionsEditor").innerHTML=items.map((item,i)=>'<div class="card" style="margin:12px 0;padding:16px"><div class="toolbar"><strong>Section '+(i+1)+'</strong><div class="actions"><button class="button small ghost" type="button" data-section-move="'+i+'" data-dir="-1" '+(i===0?'disabled':'')+'>↑</button><button class="button small ghost" type="button" data-section-move="'+i+'" data-dir="1" '+(i===items.length-1?'disabled':'')+'>↓</button><button class="button small danger" type="button" data-section-remove="'+i+'">Remove</button></div></div><div class="grid"><div class="field"><label>Small label / eyebrow</label><input data-section-index="'+i+'" data-section-field="eyebrow" maxlength="80" value="'+esc(item.eyebrow)+'"></div><div class="field"><label>Section heading</label><input data-section-index="'+i+'" data-section-field="title" maxlength="120" value="'+esc(item.title)+'"></div><div class="field full"><label>Section text</label><textarea data-section-index="'+i+'" data-section-field="body" rows="3" maxlength="1200">'+esc(item.body)+'</textarea></div><div class="field"><label>Image URL or repository path</label><input data-section-index="'+i+'" data-section-field="imageUrl" maxlength="500" value="'+esc(item.imageUrl)+'" placeholder="/images/section.webp"></div><div class="field"><label>Button label</label><input data-section-index="'+i+'" data-section-field="buttonLabel" maxlength="80" value="'+esc(item.buttonLabel)+'"></div><div class="field"><label>Button link</label><input data-section-index="'+i+'" data-section-field="buttonUrl" maxlength="500" value="'+esc(item.buttonUrl)+'" placeholder="/features.html"></div><label class="check-row"><input type="checkbox" data-section-index="'+i+'" data-section-field="active" '+(item.active!==false?'checked':'')+'><span><strong>Publish this section</strong><small>Turn off to keep it saved but hidden on the public page.</small></span></label></div></div>').join("")||'<div class="empty">No custom sections on this page yet. Add one to extend the existing page.</div>';
+}
+function syncCmsPageBlockInput(e){const el=e.target.closest("[data-section-index]");if(!el)return;const item=websiteContent.pageSections?.[cmsSectionPage]?.[Number(el.dataset.sectionIndex)];if(item)item[el.dataset.sectionField]=el.type==="checkbox"?el.checked:el.value}
 async function loadWebsiteContent(){
  try{
   const d=await api("/api/admin/content");websiteContent=d.content||{};
   document.querySelectorAll("[data-content-path]").forEach(el=>{const value=cmsGet(websiteContent,el.dataset.contentPath);if(el.type==="checkbox")el.checked=value===true;else el.value=value??""});
-  $("#cmsHighlights").value=JSON.stringify(websiteContent.home?.highlights||[],null,2);
-  $("#cmsPageSeo").value=JSON.stringify(websiteContent.pages||{},null,2);
-  $("#cmsPageSections").value=JSON.stringify(websiteContent.pageSections||{},null,2);
+  cmsSeoPage="home";cmsSectionPage="home";$("#cmsSeoPage").value=cmsSeoPage;$("#cmsSectionPage").value=cmsSectionPage;
+  renderCmsHighlights();renderCmsSeo();renderCmsPageSections();
   $("#cmsSaveStatus").textContent="Content loaded"+(d.updatedAt?" · Last saved "+new Date(d.updatedAt).toLocaleString():" · Using default content until your first save.")+".";
   $("#cmsSaveStatus").className="notice info";return true;
  }catch(e){$("#cmsSaveStatus").textContent=e.message;$("#cmsSaveStatus").className="notice error";return false}
@@ -278,11 +324,11 @@ async function loadWebsiteContent(){
 function collectWebsiteContent(){
  const content=JSON.parse(JSON.stringify(websiteContent||{}));
  document.querySelectorAll("[data-content-path]").forEach(el=>{let value;if(el.type==="checkbox")value=el.checked;else if(el.dataset.contentPath==="network.bedrockPort")value=el.value===""?19132:Number(el.value);else value=el.value.trim();cmsSet(content,el.dataset.contentPath,value)});
- try{content.home=content.home||{};content.home.highlights=JSON.parse($("#cmsHighlights").value||"[]")}catch{throw new Error("Homepage highlights must be valid JSON before saving.")}
- try{content.pages=JSON.parse($("#cmsPageSeo").value||"{}")}catch{throw new Error("Page SEO must be valid JSON before saving.")}
- try{content.pageSections=JSON.parse($("#cmsPageSections").value||"{}")}catch{throw new Error("Custom page sections must be valid JSON before saving.")}
+ cmsCurrentSeo();
+ content.home=content.home||{};content.home.highlights=websiteContent.home?.highlights||[];
+ content.pages=websiteContent.pages||{};content.pageSections=websiteContent.pageSections||{};
  const validPublicUrl=value=>!value||(/^\/(?!\/)/.test(value)||/^https:\/\//i.test(value));
- for(const [label,value] of [["Logo URL",content.site.logoUrl],["Favicon URL",content.site.faviconUrl],["Announcement URL",content.announcement.linkUrl],["Social link",Object.values(content.social).find(v=>v&&!/^https:\/\//i.test(v))],["SEO image URL",content.seo.ogImage]]){
+ for(const [label,value] of [["Logo URL",content.site.logoUrl],["Favicon URL",content.site.faviconUrl],["Hero background URL",content.home.heroBackgroundUrl],["Secondary CTA URL",content.home.secondaryCtaUrl],["Announcement URL",content.announcement.linkUrl],["Social link",Object.values(content.social).find(v=>v&&!/^https:\/\//i.test(v))],["SEO image URL",content.seo.ogImage],["Navigation URL",Object.values(content.navigationUrls||{}).find(v=>v&&!validPublicUrl(v))],["Page hero image URL",Object.values(content.pages||{}).map(p=>p.heroImageUrl).find(v=>v&&!validPublicUrl(v))]]){
   if(value&&!validPublicUrl(value))throw new Error(label+" must be an HTTPS URL or a site-relative path starting with /.");
  }
  if(content.site.supportEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(content.site.supportEmail))throw new Error("Enter a valid support email address.");
@@ -311,7 +357,16 @@ async function saveWebsiteContent(){
 $("#saveWebsiteContent").addEventListener("click",saveWebsiteContent);
 $("#reloadWebsiteContent").addEventListener("click",loadWebsiteContent);
 $("#reloadWebsiteContentBottom").addEventListener("click",async()=>{const ok=await askConfirm("Discard unsaved website edits?","Unsaved values in this editor will be replaced with the last saved version.","Discard edits");if(ok)await loadWebsiteContent()});
-$("#previewWebsiteContent").addEventListener("click",()=>window.open("/","_blank","noopener"));
+$("#previewWebsiteContent").addEventListener("click",()=>window.open(cmsSectionPage==="home"?"/":"/"+cmsSectionPage+".html","_blank","noopener"));
+$("#cmsSeoPage").addEventListener("change",()=>{cmsCurrentSeo();cmsSeoPage=$("#cmsSeoPage").value;renderCmsSeo()});
+["cmsSeoTitle","cmsSeoHeading","cmsSeoDescription","cmsSeoIntro","cmsSeoHeroImage"].forEach(id=>$("#"+id).addEventListener("input",cmsCurrentSeo));
+$("#cmsSectionPage").addEventListener("change",()=>{cmsSectionPage=$("#cmsSectionPage").value;renderCmsPageSections()});
+$("#cmsAddHighlight").addEventListener("click",()=>{websiteContent.home=websiteContent.home||{};websiteContent.home.highlights=websiteContent.home.highlights||[];if(websiteContent.home.highlights.length>=8){toast("You can add up to 8 homepage highlights.","error");return}websiteContent.home.highlights.push({id:"highlight-"+(websiteContent.home.highlights.length+1),icon:"✦",title:"New highlight",description:"Describe this server feature."});renderCmsHighlights()});
+$("#cmsHighlightsEditor").addEventListener("input",e=>{const el=e.target.closest("[data-highlight-index]");if(!el)return;const item=websiteContent.home?.highlights?.[Number(el.dataset.highlightIndex)];if(item)item[el.dataset.highlightField]=el.value});
+$("#cmsHighlightsEditor").addEventListener("click",e=>{const remove=e.target.closest("[data-highlight-remove]"),move=e.target.closest("[data-highlight-move]"),list=websiteContent.home?.highlights;if(remove){list.splice(Number(remove.dataset.highlightRemove),1);renderCmsHighlights()}else if(move){const i=Number(move.dataset.highlightMove),j=i+Number(move.dataset.dir);if(j>=0&&j<list.length){[list[i],list[j]]=[list[j],list[i]];renderCmsHighlights()}}});
+$("#cmsPageSectionsEditor").addEventListener("input",syncCmsPageBlockInput);$("#cmsPageSectionsEditor").addEventListener("change",syncCmsPageBlockInput);
+$("#cmsPageSectionsEditor").addEventListener("click",e=>{const remove=e.target.closest("[data-section-remove]"),move=e.target.closest("[data-section-move]"),list=websiteContent.pageSections[cmsSectionPage];if(remove){list.splice(Number(remove.dataset.sectionRemove),1);renderCmsPageSections()}else if(move){const i=Number(move.dataset.sectionMove),j=i+Number(move.dataset.dir);if(j>=0&&j<list.length){[list[i],list[j]]=[list[j],list[i]];renderCmsPageSections()}}});
+$("#cmsAddPageSection").addEventListener("click",()=>{websiteContent.pageSections=websiteContent.pageSections||{};websiteContent.pageSections[cmsSectionPage]=websiteContent.pageSections[cmsSectionPage]||[];const list=websiteContent.pageSections[cmsSectionPage];if(list.length>=12){toast("Each page supports up to 12 custom sections.","error");return}list.push({id:"section-"+(list.length+1),eyebrow:"",title:"New section",body:"",imageUrl:"",buttonLabel:"",buttonUrl:"",active:true});renderCmsPageSections()});
 
 async function loadStaff(){try{staff=(await api("/api/admin/staff")).staff||[];$("#staffTable").innerHTML=table(["Staff member","Role","Status","Actions"],staff.map(s=>[esc(s.email),esc(s.role.replaceAll("_"," ")),statePill(s.active),'<div class="actions"><button class="button small ghost" data-staff-toggle="'+esc(s.email)+'">'+(s.active?"Deactivate":"Reactivate")+'</button><button class="button small" data-staff-role="'+esc(s.email)+'">Change role</button></div>']),"No staff accounts","Create limited-access staff accounts above.");$("#staffTable").querySelectorAll("[data-staff-toggle]").forEach(b=>b.onclick=()=>changeStaffActive(staff.find(s=>s.email===b.dataset.staffToggle)));$("#staffTable").querySelectorAll("[data-staff-role]").forEach(b=>b.onclick=()=>changeStaffRole(staff.find(s=>s.email===b.dataset.staffRole)));return true}catch(e){$("#staffTable").innerHTML='<div class="empty"><strong>Staff records unavailable</strong>'+esc(e.message)+'</div>';toast(e.message,"error");return false}}
 $("#staffForm").addEventListener("submit",async e=>{e.preventDefault();const f=e.currentTarget,b=f.querySelector('[type="submit"]');b.disabled=true;try{const p={email:f.elements.email.value.trim(),password:f.elements.password.value,role:f.elements.role.value};await api("/api/admin/staff",{method:"POST",body:JSON.stringify(p)});f.reset();if(await loadStaff())toast("Staff account created.")}catch(err){toast(err.message,"error")}finally{b.disabled=false}});

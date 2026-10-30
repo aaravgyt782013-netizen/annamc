@@ -45,13 +45,35 @@
     document.querySelectorAll("[data-cms-src]").forEach(el=>{const url=safeUrl(get(content,el.getAttribute("data-cms-src")));if(url)el.setAttribute("src",url);});
     document.querySelectorAll("[data-cms-show]").forEach(el=>{if(get(content,el.getAttribute("data-cms-show"))===false)el.hidden=true;});
     document.querySelectorAll("[data-cms-server-address]").forEach(el=>{el.textContent=content.home?.serverAddress||content.network?.proxyAddress||"";});
+    if(pageSeo.heading||pageSeo.intro||pageSeo.heroImageUrl){
+      const main=document.querySelector("main"),heading=main?.querySelector("h1"),intro=main?.querySelector("section p"),hero=main?.querySelector(":scope > section:first-child");
+      if(heading&&pageSeo.heading)heading.textContent=pageSeo.heading;
+      if(intro&&pageSeo.intro)intro.textContent=pageSeo.intro;
+      const image=safeUrl(pageSeo.heroImageUrl);
+      if(hero&&image){hero.style.backgroundImage="linear-gradient(180deg,rgba(10,10,12,.76),rgba(10,10,12,.92)),url("+JSON.stringify(image)+")";hero.style.backgroundSize="cover";hero.style.backgroundPosition="center";hero.style.borderRadius="22px";}
+    }
+    if(pageKey==="home"&&content.home?.heroBackgroundUrl){
+      const hero=document.querySelector("main > section:first-child"),image=safeUrl(content.home.heroBackgroundUrl);
+      if(hero&&image){hero.style.backgroundImage="linear-gradient(180deg,rgba(10,10,12,.76),rgba(10,10,12,.92)),url("+JSON.stringify(image)+")";hero.style.backgroundSize="cover";hero.style.backgroundPosition="center";hero.style.borderRadius="24px";hero.style.border="1px solid rgba(242,202,80,.16)";hero.style.padding="28px 14px";}
+    }
+    const secondaryLabel=content.home?.secondaryCtaLabel,secondaryUrl=safeUrl(content.home?.secondaryCtaUrl),joinButton=document.querySelector("[data-cms-copy-server]");
+    if(pageKey==="home"&&joinButton&&secondaryLabel&&secondaryUrl&&!document.getElementById("anna-cms-secondary-cta")){
+      const link=document.createElement("a");link.id="anna-cms-secondary-cta";link.href=secondaryUrl;link.textContent=secondaryLabel;link.className="px-7 py-4 rounded-xl border border-primary/40 text-primary font-tech font-bold text-sm tracking-widest text-center transition hover:bg-primary/10";link.style.display="inline-flex";link.style.alignItems="center";link.style.justifyContent="center";link.style.margin="8px";joinButton.parentElement.insertBefore(link,joinButton.nextSibling);
+    }
     document.querySelectorAll("[data-cms-copy-server]").forEach(el=>el.addEventListener("click",async()=>{
       const address=content.home?.serverAddress||content.network?.proxyAddress||"";
       if(!address)return;
       try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(address);else throw new Error("Clipboard unavailable");toast("Server address copied: "+address);}
-      catch{window.prompt("Copy the Anna MC server address",address);}
+      catch{const field=document.createElement("textarea");field.value=address;field.setAttribute("readonly","");field.style.position="fixed";field.style.opacity="0";document.body.appendChild(field);field.select();let copied=false;try{copied=document.execCommand("copy")}catch{}field.remove();toast(copied?"Server address copied: "+address:"Clipboard access was blocked. Server address: "+address);}
     }));
-    const nav=content.navigation||{};
+    const nav=content.navigation||{},navLabels=content.navigationLabels||{},navUrls=content.navigationUrls||{};
+    const navConfig={store:'a[href*="store"]',features:'a[href*="features"]',forums:'a[href*="forums"]',wiki:'a[href*="wiki"]',vote:'a[href*="vote"]',staff:'a[href*="staff"]'};
+    for(const [key,selector] of Object.entries(navConfig))document.querySelectorAll("header "+selector).forEach(el=>{
+      if(nav[key]===false)el.hidden=true;
+      const url=safeUrl(navUrls[key]);if(url)el.setAttribute("href",url);
+      const label=typeof navLabels[key]==="string"?navLabels[key].trim():"";
+      if(label){const node=Array.from(el.childNodes).find(n=>n.nodeType===3&&n.textContent.trim());if(node)node.nodeValue=label;else el.appendChild(document.createTextNode(label));}
+    });
     const navSelectors={store:'a[href*="store"]',features:'a[href*="features"]',forums:'a[href*="forums"]',wiki:'a[href*="wiki"]',vote:'a[href*="vote"]',staff:'a[href*="staff"]'};
     for(const [key,selector] of Object.entries(navSelectors))if(nav[key]===false)document.querySelectorAll("header "+selector).forEach(el=>el.hidden=true);
     const footer=content.footer||{};
