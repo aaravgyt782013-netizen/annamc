@@ -1,4 +1,4 @@
-const { send, method } = require("../lib/server");
+const { send, method, db } = require("../lib/server");
 
 const TARGETS = {
   proxy: "sg-4.madflex.shop:19139",
@@ -38,8 +38,18 @@ function normalize(data) {
 
 module.exports = async function handler(req, res) {
   if (!method(req, res, ["GET"])) return;
+  let targets = TARGETS;
   try {
-    const entries = await Promise.all(Object.entries(TARGETS).map(async ([key, address]) => {
+    const saved = await db().query("SELECT setting_value FROM site_settings WHERE setting_key=$1", ["site_content"]);
+    const network = saved.rows[0]?.setting_value?.network || {};
+    targets = {
+      proxy: typeof network.proxyAddress === "string" ? network.proxyAddress : TARGETS.proxy,
+      lifesteal: typeof network.lifestealAddress === "string" ? network.lifestealAddress : TARGETS.lifesteal,
+      practice: typeof network.practiceAddress === "string" ? network.practiceAddress : TARGETS.practice
+    };
+  } catch (error) { console.warn("Using fallback Minecraft addresses; CMS settings could not be read."); }
+  try {
+    const entries = await Promise.all(Object.entries(targets).map(async ([key, address]) => {
       try { return [key, normalize(await query(address)), true]; }
       catch (error) {
         console.error("Minecraft status lookup failed for", key, error && error.name || "Error");
