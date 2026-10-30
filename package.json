@@ -6,7 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "check": "node --check server.js && node --check lib/server.js && node --check api/auth/login.js && node --check api/auth/me.js && node --check api/auth/logout.js && node --check api/admin/products.js && node --check api/admin/orders.js && node --check api/admin/announcements.js && node --check api/admin/gamemodes.js && node --check api/admin/voting.js && node --check api/admin/staff.js && node --check api/admin/audit.js && node --check api/admin/health.js && node --check api/admin/reset-content.js && node --check api/admin/repair-schema.js && node --check api/admin/site-config.js && node --check api/site-config.js && node --check lib/site-content.js && node --check api/admin/content.js && node --check api/content.js && node --check api/status.js && node --check site-content.js",
+    "check": "node --check server.js && node --check lib/server.js && node --check api/auth/login.js && node --check api/auth/me.js && node --check api/auth/logout.js && node --check api/admin/products.js && node --check api/admin/orders.js && node --check api/admin/announcements.js && node --check api/admin/gamemodes.js && node --check api/admin/voting.js && node --check api/admin/staff.js && node --check api/admin/audit.js && node --check api/admin/health.js && node --check api/admin/reset-content.js && node --check api/admin/repair-schema.js && node --check api/admin/site-config.js && node --check api/site-config.js && node --check lib/site-content.js && node --check api/admin/content.js && node --check api/content.js && node --check api/status.js && node --check site-content.js && node scripts/check-inline.js",
     "start": "node server.js"
   },
   "dependencies": {
