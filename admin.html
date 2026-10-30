@@ -184,7 +184,8 @@ body{background:radial-gradient(ellipse at 78% -18%,#e8c64e12,transparent 38%),r
   </div>
   <div class="field"><label>Default meta description</label><textarea rows="2" data-content-path="seo.description" maxlength="320"></textarea></div>
   <div class="field"><label>Search keywords</label><input data-content-path="seo.keywords" maxlength="500"></div>
-  <div class="field"><label for="cmsPageSeo">Individual page titles & descriptions · JSON</label><textarea id="cmsPageSeo" class="code" rows="9" spellcheck="false"></textarea><p class="note">Use this for home, store, features, forums, wiki, vote, staff and contact. This controls search metadata, not the legal meaning of policy pages.</p></div>
+  <div class="field"><label for="cmsPageSeo">Individual page titles & descriptions · JSON</label><textarea id="cmsPageSeo" class="code" rows="9" spellcheck="false"></textarea><p class="note">Controls search metadata for home, store, features, forums, wiki, vote, staff, contact, privacy and terms.</p></div>
+  <div class="field"><label for="cmsPageSections">Custom content sections for each page · JSON</label><textarea id="cmsPageSections" class="code" rows="12" spellcheck="false"></textarea><p class="note">Add up to 12 extra text/image/CTA sections per page without touching source files. Use plain text only. Example: {"home":[{"id":"season-1","eyebrow":"SEASON 01","title":"The new era","body":"A new chapter begins on Anna MC.","imageUrl":"/images/season.jpg","buttonLabel":"Explore","buttonUrl":"/features.html","active":true}],"features":[]}. Existing page sections can still be hidden through the advanced page editor.</p></div>
   <div class="form-actions"><button class="button primary" type="button" id="saveWebsiteContent">Save all website changes</button><button class="button ghost" type="button" id="reloadWebsiteContentBottom">Discard unsaved changes / reload</button></div>
  </form>
 </div>
@@ -269,6 +270,7 @@ async function loadWebsiteContent(){
   document.querySelectorAll("[data-content-path]").forEach(el=>{const value=cmsGet(websiteContent,el.dataset.contentPath);if(el.type==="checkbox")el.checked=value===true;else el.value=value??""});
   $("#cmsHighlights").value=JSON.stringify(websiteContent.home?.highlights||[],null,2);
   $("#cmsPageSeo").value=JSON.stringify(websiteContent.pages||{},null,2);
+  $("#cmsPageSections").value=JSON.stringify(websiteContent.pageSections||{},null,2);
   $("#cmsSaveStatus").textContent="Content loaded"+(d.updatedAt?" · Last saved "+new Date(d.updatedAt).toLocaleString():" · Using default content until your first save.")+".";
   $("#cmsSaveStatus").className="notice info";return true;
  }catch(e){$("#cmsSaveStatus").textContent=e.message;$("#cmsSaveStatus").className="notice error";return false}
@@ -278,6 +280,7 @@ function collectWebsiteContent(){
  document.querySelectorAll("[data-content-path]").forEach(el=>{let value;if(el.type==="checkbox")value=el.checked;else if(el.dataset.contentPath==="network.bedrockPort")value=el.value===""?19132:Number(el.value);else value=el.value.trim();cmsSet(content,el.dataset.contentPath,value)});
  try{content.home=content.home||{};content.home.highlights=JSON.parse($("#cmsHighlights").value||"[]")}catch{throw new Error("Homepage highlights must be valid JSON before saving.")}
  try{content.pages=JSON.parse($("#cmsPageSeo").value||"{}")}catch{throw new Error("Page SEO must be valid JSON before saving.")}
+ try{content.pageSections=JSON.parse($("#cmsPageSections").value||"{}")}catch{throw new Error("Custom page sections must be valid JSON before saving.")}
  return content;
 }
 async function saveWebsiteContent(){
